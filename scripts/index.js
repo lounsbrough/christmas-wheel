@@ -335,7 +335,6 @@ $(function() {
     }
   });
 
-  // Easter Egg - Click On Wheel Or Complete Span - 5 Clicks To Toggle Email Active - 10 Clicks To Reset Drawing
   $("#winwheelCanvas").click(function() {
     count_wheel_clicks();
   });
@@ -343,9 +342,8 @@ $(function() {
     count_wheel_clicks();
   });
 
-  // Initialize WinWheel
   if ($("#content_wrapper_div").length > 0) {
-    begin();
+    initializeWheel();
   }
 
   if (isMobile.any()) {

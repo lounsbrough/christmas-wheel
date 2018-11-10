@@ -15,7 +15,7 @@ var prizes = window.people.map((person, i) => {
   return { name: person["name"], startAngle: startAngle, endAngle: endAngle };
 });
 
-function begin() {
+function initializeWheel() {
   surface = document.getElementById(canvasId);
 
   if (surface.getContext) {
