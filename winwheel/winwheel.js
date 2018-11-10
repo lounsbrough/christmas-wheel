@@ -28,11 +28,6 @@ var targetAngle = 0;
 var currentAngle = 0;
 var power = 1;
 
-var xhr = new XMLHttpRequest();
-xhr.onreadystatechange = ajaxCallback;
-
-var randomLastThreshold = 150;
-
 var spinTimer;
 
 var wheelState = "reset";
@@ -70,7 +65,6 @@ function startSpin(determinedValue) {
 
   if (typeof stopAngle !== "undefined" && wheelState == "reset" && power) {
     targetAngle = 360 * (power * 6) + stopAngle;
-    randomLastThreshold = Math.floor(90 + Math.random() * 90);
     wheelState = "spinning";
     doSpin();
   }
@@ -91,18 +85,6 @@ function angleBetween(angle, start, end, full) {
   return end >= start
     ? angle >= start && angle <= end
     : angle >= start || angle <= end;
-}
-
-function ajaxCallback() {
-  if (xhr.readyState < 4) {
-    return;
-  }
-
-  if (xhr.status !== 200) {
-    return;
-  }
-
-  startSpin(xhr.responseText);
 }
 
 function doSpin() {
