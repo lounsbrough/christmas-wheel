@@ -5,18 +5,9 @@ var angle = 0;
 var targetAngle = 0;
 var currentAngle = 0;
 var power = 1;
-var spinTimer;
 var wheelState = "reset";
-
-var marker_points_x = [350, 500, 350];
-var marker_points_y = [360, 350, 340];
-var marker_aspect_ratio =
-  (700 - marker_points_x[0]) / (marker_points_y[2] - marker_points_y[1]);
-var marker_color = "rgba(83,153,217,0.75)";
-
-var countPrizes = 6;
 var firstAngle = 330;
-var prizeWidth = (360 - countPrizes) / countPrizes;
+var prizeWidth = (360 - window.people.length) / window.people.length;
 
 var prizes = window.people.map((person, i) => {
   var startAngle = (firstAngle + i + i * prizeWidth) % 360;
@@ -40,7 +31,7 @@ function initialDraw(e) {
   var surfaceContext = surface.getContext("2d");
   surfaceContext.drawImage(wheel, 0, 0);
 
-  drawMarker();
+  drawStaticWheelElements();
 }
 
 function startSpin(determinedValue) {
@@ -88,7 +79,7 @@ function doSpin() {
   surfaceContext.drawImage(wheel, 0, 0);
   surfaceContext.restore();
 
-  drawMarker();
+  drawStaticWheelElements();
 
   currentAngle += angle;
 
@@ -115,22 +106,15 @@ function degreesToRadians(degrees) {
 }
 
 function resetWheel() {
-  clearTimeout(spinTimer);
-
   angle = 0;
   targetAngle = 0;
   currentAngle = 0;
-
-  document.getElementById("pw1").className = "";
-  document.getElementById("pw2").className = "";
-  document.getElementById("pw3").className = "";
-
   wheelState = "reset";
 
   initialDraw();
 }
 
-function drawMarker() {
+function drawStaticWheelElements() {
   var surfaceContext = surface.getContext("2d");
   drawGrommet(surfaceContext);
   drawPointer(surfaceContext);
@@ -145,11 +129,15 @@ function drawGrommet(surfaceContext) {
 }
 
 function drawPointer(surfaceContext) {
-  surfaceContext.fillStyle = marker_color;
+  var pointsX = [350, 500, 350];
+  var pointsY = [360, 350, 340];
+  var pointerColor = "rgba(83,153,217,0.75)";
+
+  surfaceContext.fillStyle = pointerColor;
   surfaceContext.beginPath();
-  surfaceContext.moveTo(marker_points_x[0], marker_points_y[0]);
-  for (var i = 1; i < marker_points_x.length; i++) {
-    surfaceContext.lineTo(marker_points_x[i], marker_points_y[i]);
+  surfaceContext.moveTo(pointsX[0], pointsY[0]);
+  for (var i = 1; i < pointsX.length; i++) {
+    surfaceContext.lineTo(pointsX[i], pointsY[i]);
   }
   surfaceContext.closePath();
   surfaceContext.fill();
