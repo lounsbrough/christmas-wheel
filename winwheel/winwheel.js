@@ -1,6 +1,12 @@
 var wheel;
 var canvasId = "winwheelCanvas";
-var wheelImageName = "winwheel/prizewheel.png";
+var surface;
+var angle = 0;
+var targetAngle = 0;
+var currentAngle = 0;
+var power = 1;
+var spinTimer;
+var wheelState = "reset";
 
 var marker_points_x = [350, 500, 350];
 var marker_points_y = [360, 350, 340];
@@ -18,17 +24,6 @@ var prizes = window.people.map((person, i) => {
   return { name: person["name"], startAngle: startAngle, endAngle: endAngle };
 });
 
-var surface;
-var wheel;
-var angle = 0;
-var targetAngle = 0;
-var currentAngle = 0;
-var power = 1;
-
-var spinTimer;
-
-var wheelState = "reset";
-
 function begin() {
   surface = document.getElementById(canvasId);
 
@@ -36,7 +31,7 @@ function begin() {
     wheel = new Image();
     wheel.width = "700";
     wheel.height = "700";
-    wheel.src = wheelImageName;
+    wheel.src = "winwheel/prizewheel.png";
     wheel.onload = initialDraw;
   }
 }
@@ -119,27 +114,12 @@ function degreesToRadians(degrees) {
   return (degrees * Math.PI) / 180;
 }
 
-function powerSelected(powerLevel) {
-  if (wheelState == "reset") {
-    document.getElementById("pw1").className = "";
-    document.getElementById("pw2").className = "";
-    document.getElementById("pw3").className = "";
-
-    if (powerLevel >= 1) document.getElementById("pw1").className = "pw1";
-    if (powerLevel >= 2) document.getElementById("pw2").className = "pw2";
-    if (powerLevel >= 3) document.getElementById("pw3").className = "pw3";
-
-    power = powerLevel;
-  }
-}
-
 function resetWheel() {
   clearTimeout(spinTimer);
 
   angle = 0;
   targetAngle = 0;
   currentAngle = 0;
-  power = 0;
 
   document.getElementById("pw1").className = "";
   document.getElementById("pw2").className = "";
