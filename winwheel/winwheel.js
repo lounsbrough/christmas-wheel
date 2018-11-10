@@ -7,9 +7,6 @@ var marker_points_y = [360, 350, 340];
 var marker_aspect_ratio =
   (700 - marker_points_x[0]) / (marker_points_y[2] - marker_points_y[1]);
 var marker_color = "rgba(83,153,217,0.75)";
-var marker_gradient_color = "rgba(83,153,217,0.25)";
-var marker_gradient_width = 100;
-var marker_gradient_smoothness = 20;
 
 var countPrizes = 6;
 var firstAngle = 330;
@@ -157,7 +154,6 @@ function drawMarker() {
   var surfaceContext = surface.getContext("2d");
   drawGrommet(surfaceContext);
   drawPointer(surfaceContext);
-  drawTransparencyGradient(surfaceContext);
 }
 
 function drawGrommet(surfaceContext) {
@@ -177,23 +173,4 @@ function drawPointer(surfaceContext) {
   }
   surfaceContext.closePath();
   surfaceContext.fill();
-}
-
-function drawTransparencyGradient(surfaceContext) {
-  surfaceContext.fillStyle = marker_gradient_color;
-  for (var j = 1; j <= marker_gradient_smoothness; j++) {
-    surfaceContext.beginPath();
-    surfaceContext.moveTo(marker_points_x[0] -
-      (marker_gradient_width * j) / marker_gradient_smoothness, marker_points_y[0]);
-    for (var i = 1; i < marker_points_x.length; i++) {
-      var marker_height = marker_points_y[i] +
-        ((marker_points_y[i] - 350) / Math.abs(marker_points_y[i] - 350)) *
-        (marker_gradient_width / marker_aspect_ratio) *
-        (j / marker_gradient_smoothness);
-      var marker_curvature_adjustment = 0;
-      surfaceContext.lineTo(marker_points_x[i] - marker_curvature_adjustment, marker_height);
-    }
-    surfaceContext.closePath();
-    surfaceContext.fill();
-  }
 }
