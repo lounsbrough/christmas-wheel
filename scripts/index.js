@@ -562,7 +562,7 @@ function dummySpin() {
     var surfaceContext = surface.getContext("2d");
     surfaceContext.save();
     surfaceContext.translate(wheel.width * 0.5, wheel.height * 0.5);
-    surfaceContext.rotate(DegToRad(currentDummyAngle));
+    surfaceContext.rotate(degreesToRadians(currentDummyAngle));
     surfaceContext.translate(-wheel.width * 0.5, -wheel.height * 0.5);
     surfaceContext.drawImage(wheel, 0, 0);
     surfaceContext.restore();

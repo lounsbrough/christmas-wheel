@@ -87,9 +87,9 @@ function angleBetween(angle, start, end, full) {
 function doSpin() {
   var surfaceContext = surface.getContext("2d");
   surfaceContext.save();
-  surfaceContext.translate(wheel.width * 0.5, wheel.height * 0.5);
-  surfaceContext.rotate(DegToRad(currentAngle));
-  surfaceContext.translate(-wheel.width * 0.5, -wheel.height * 0.5);
+  surfaceContext.translate(wheel.width / 2, wheel.height / 2);
+  surfaceContext.rotate(degreesToRadians(currentAngle));
+  surfaceContext.translate(-wheel.width / 2, -wheel.height / 2);
   surfaceContext.drawImage(wheel, 0, 0);
   surfaceContext.restore();
 
@@ -115,8 +115,8 @@ function doSpin() {
   }
 }
 
-function DegToRad(d) {
-  return d * 0.01745329251994329576923690768489;
+function degreesToRadians(degrees) {
+  return (degrees * Math.PI) / 180;
 }
 
 function powerSelected(powerLevel) {
