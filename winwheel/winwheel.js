@@ -99,7 +99,6 @@ function doSpin() {
   drawMarker();
 
   currentAngle += angle;
-  //alert(currentAngle);
 
   if (currentAngle < targetAngle) {
     var angleRemaining = targetAngle - currentAngle;
@@ -156,15 +155,20 @@ function resetWheel() {
 
 function drawMarker() {
   var surfaceContext = surface.getContext("2d");
+  drawGrommet(surfaceContext);
+  drawPointer(surfaceContext);
+  drawTransparencyGradient(surfaceContext);
+}
 
-  // Draw Grommet
+function drawGrommet(surfaceContext) {
   surfaceContext.fillStyle = "rgba(83,153,217,1)";
   surfaceContext.beginPath();
   surfaceContext.arc(350, 350, 10, 0, 2 * Math.PI);
   surfaceContext.closePath();
   surfaceContext.fill();
+}
 
-  // Draw triangle
+function drawPointer(surfaceContext) {
   surfaceContext.fillStyle = marker_color;
   surfaceContext.beginPath();
   surfaceContext.moveTo(marker_points_x[0], marker_points_y[0]);
@@ -173,27 +177,21 @@ function drawMarker() {
   }
   surfaceContext.closePath();
   surfaceContext.fill();
+}
 
-  // Draw transparent gradient
+function drawTransparencyGradient(surfaceContext) {
   surfaceContext.fillStyle = marker_gradient_color;
   for (var j = 1; j <= marker_gradient_smoothness; j++) {
     surfaceContext.beginPath();
-    surfaceContext.moveTo(
-      marker_points_x[0] -
-        (marker_gradient_width * j) / marker_gradient_smoothness,
-      marker_points_y[0]
-    );
+    surfaceContext.moveTo(marker_points_x[0] -
+      (marker_gradient_width * j) / marker_gradient_smoothness, marker_points_y[0]);
     for (var i = 1; i < marker_points_x.length; i++) {
-      var marker_height =
-        marker_points_y[i] +
+      var marker_height = marker_points_y[i] +
         ((marker_points_y[i] - 350) / Math.abs(marker_points_y[i] - 350)) *
-          (marker_gradient_width / marker_aspect_ratio) *
-          (j / marker_gradient_smoothness);
-      var marker_curvature_adjustment = 0; // 350 - 350*Math.cos(Math.asin(Math.abs(marker_height-350)/350));
-      surfaceContext.lineTo(
-        marker_points_x[i] - marker_curvature_adjustment,
-        marker_height
-      );
+        (marker_gradient_width / marker_aspect_ratio) *
+        (j / marker_gradient_smoothness);
+      var marker_curvature_adjustment = 0;
+      surfaceContext.lineTo(marker_points_x[i] - marker_curvature_adjustment, marker_height);
     }
     surfaceContext.closePath();
     surfaceContext.fill();
