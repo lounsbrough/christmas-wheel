@@ -24,7 +24,7 @@
 
 </head>
 
-<body style="background-image:url('glass-bubbles.jpg');background-repeat:no-repeat">
+<body style="background-image:url('images/glass-bubbles.jpg');background-repeat:no-repeat">
 
 <?PHP
 
