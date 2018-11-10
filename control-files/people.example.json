@@ -1,0 +1,29 @@
+[
+  {
+    "name": "Person 1",
+    "email": "person1@gmail.com",
+    "assignedRecipient": null,
+    "excludedRecipients": [],
+    "wishList": ["gift item 1", "gift item 2"],
+    "wheelIndex": 0
+  },
+  {
+    "name": "Person 2",
+    "email": "person2@gmail.com",
+    "assignedRecipient": null,
+    "excludedRecipients": [],
+    "wishList": ["gift item 1", "gift item 2", "gift item 3"],
+    "wheelIndex": 1
+  },
+  {
+    "name": "Person 3",
+    "email": "person3@gmail.com",
+    "assignedRecipient": null,
+    "excludedRecipients": ["Person 1"],
+    "wishList": [
+      "gift item 1",
+      "<a href='http://www.awesomegift.com' target='_blank'>Awesome Gift</a>"
+    ],
+    "wheelIndex": 2
+  }
+]
