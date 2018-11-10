@@ -18,7 +18,7 @@
 <link rel="stylesheet" href="assets/jquery-ui-1.12.1/jquery-ui.min.css"/>
 <script src="assets/jquery-ui-1.12.1/jquery-ui.min.js"></script>
 <script src="assets/touch-punch.js"></script>
-<script src="winwheel/winwheel_1.2.js?tms=<?php echo filemtime("winwheel/winwheel_1.2.js"); ?>"></script>
+<script src="winwheel/winwheel.js?tms=<?php echo filemtime("winwheel/winwheel.js"); ?>"></script>
 
 <script src="scripts/index.js?tms=<?php echo filemtime("scripts/index.js"); ?>"></script>
 
