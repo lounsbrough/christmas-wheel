@@ -1,10 +1,6 @@
 var wheel;
 var canvasId = "winwheelCanvas";
 var wheelImageName = "winwheel/prizewheel.png";
-var theSpeed = 25;
-var pointerAngle = 0;
-var spinMode = "determinedPrize";
-var determinedGetUrl = "";
 
 var marker_points_x = [350, 500, 350];
 var marker_points_y = [360, 350, 340];
@@ -63,34 +59,14 @@ function initialDraw(e) {
 function startSpin(determinedValue) {
   var stopAngle = undefined;
 
-  if (spinMode == "random") {
-    stopAngle = Math.floor(Math.random() * 360);
-  } else if (spinMode == "determinedAngle") {
-    if (typeof determinedValue === "undefined") {
-      if (determinedGetUrl) {
-        xhr.open("GET", determinedGetUrl, true);
-        xhr.send("");
-      }
-    } else {
-      stopAngle = determinedValue;
-    }
-  } else if (spinMode == "determinedPrize") {
-    if (typeof determinedValue === "undefined") {
-      if (determinedGetUrl) {
-        xhr.open("GET", determinedGetUrl, true);
-        xhr.send("");
-      }
-    } else {
-      var startAngle = prizes[determinedValue]["startAngle"];
-      var endAngle = prizes[determinedValue]["endAngle"];
-      stopAngle = Math.floor(
-        (startAngle +
-          (Math.random() * 0.5 + 0.25) *
-            rotationalDistance(startAngle, endAngle, 360)) %
-          360
-      );
-    }
-  }
+  var startAngle = prizes[determinedValue]["startAngle"];
+  var endAngle = prizes[determinedValue]["endAngle"];
+  stopAngle = Math.floor(
+    (startAngle +
+      (Math.random() * 0.5 + 0.25) *
+        rotationalDistance(startAngle, endAngle, 360)) %
+      360
+  );
 
   if (typeof stopAngle !== "undefined" && wheelState == "reset" && power) {
     targetAngle = 360 * (power * 6) + stopAngle;
