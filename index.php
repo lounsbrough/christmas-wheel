@@ -45,9 +45,6 @@ if (!empty($unassignedGivers)) {
 	    <div style="text-align:center;margin-top:25px;margin-bottom:25px">
             <button id="start_spin_button" style="font-size:25px;visibility:hidden">Spin!</button>
         </div>
-
-    </div><div id="rotate_message_div" style="margin-top:50px;min-width:700px;width:100%;text-align:center;font-size:50px;color:#FFFFFF;display:none">
-        <span id="rotate_message_span" style="background:rgba(255,255,255,0.5);padding:50px;border-radius:10px">Please rotate your device</span>
     </div>
 <?php
 } else {

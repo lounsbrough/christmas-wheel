@@ -475,42 +475,18 @@ function window_resize_function() {
   }
   $("body").css("background-size", image_size);
   if ($("#content_wrapper_div").length > 0) {
-    if (
-      1 == 2 &&
-      isMobile.any() &&
-      (window.orientation == -90 || window.orientation == 90)
-    ) {
-      $(".ui-dialog-content").css("visibility", "hidden");
-      $("#content_wrapper_div").css("display", "none");
-      $("#rotate_message_div").css("display", "block");
-      $("#rotate_message_div").finish();
-      window.setTimeout(function() {
-        $("#rotate_message_div").effect(
-          "shake",
-          { distance: 5, times: 1, easing: "swing" },
-          1000
-        );
-      }, 500);
-      $("#rotate_message_div").css(
-        "margin-top",
-        Math.round((height - 120) / 2 / viewport_scale) + "px"
-      );
-    } else {
-      $("#select_name_div").css(
-        "margin-top",
-        Math.max(Math.round((height - 850 * viewport_scale) / 2), 0) + "px"
-      );
+    $("#select_name_div").css(
+      "margin-top",
+      Math.max(Math.round((height - 850 * viewport_scale) / 2), 0) + "px"
+    );
 
-      $("#rotate_message_div").css("display", "none");
-      $("#content_wrapper_div").css("display", "block");
-      $(".ui-dialog-content").css("visibility", "visible");
-      $("#select_giver_dialog").dialog({
-        position: { my: "center", at: "center", of: "#winwheelCanvas" }
-      });
-      $("#display_wish_list").dialog({
-        position: { my: "center", at: "center", of: "#winwheelCanvas" }
-      });
-    }
+    $(".ui-dialog-content").css("visibility", "visible");
+    $("#select_giver_dialog").dialog({
+      position: { my: "center", at: "center", of: "#winwheelCanvas" }
+    });
+    $("#display_wish_list").dialog({
+      position: { my: "center", at: "center", of: "#winwheelCanvas" }
+    });
   } else {
     $("#drawing_complete_div").css(
       "margin-top",
@@ -521,8 +497,9 @@ function window_resize_function() {
 
 function reset_page_counter() {
   var seconds = $("#page_reset_seconds").html();
-  $("#page_reset_seconds").html(seconds - 1);
-  if (seconds == 2) {
+  seconds--;
+  $("#page_reset_seconds").html(seconds);
+  if (seconds == 1) {
     $("#page_reset_seconds_text").html("second");
     window.setTimeout(function() {
       window.location.replace(window.location);
