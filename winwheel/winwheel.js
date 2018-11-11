@@ -15,7 +15,7 @@ var prizes = window.people.map((person, i) => {
   return { name: person["name"], startAngle: startAngle, endAngle: endAngle };
 });
 
-function initializeWheel() {
+const initializeWheel = () => {
   surface = document.getElementById(canvasId);
 
   if (surface.getContext) {
@@ -25,16 +25,16 @@ function initializeWheel() {
     wheel.src = "winwheel/prizewheel.png";
     wheel.onload = initialDraw;
   }
-}
+};
 
-function initialDraw(e) {
+const initialDraw = e => {
   var surfaceContext = surface.getContext("2d");
   surfaceContext.drawImage(wheel, 0, 0);
 
   drawStaticWheelElements();
-}
+};
 
-function startSpin(determinedValue) {
+const startSpin = determinedValue => {
   var stopAngle = undefined;
 
   var startAngle = prizes[determinedValue]["startAngle"];
@@ -51,16 +51,16 @@ function startSpin(determinedValue) {
     wheelState = "spinning";
     doSpin();
   }
-}
+};
 
-function rotationalDistance(start, end, full) {
+const rotationalDistance = (start, end, full) => {
   start = start % full;
   end = end % full;
 
   return end - start + (end >= start ? 0 : full);
-}
+};
 
-function angleBetween(angle, start, end, full) {
+const angleBetween = (angle, start, end, full) => {
   angle = angle % full;
   start = start % full;
   end = end % full;
@@ -68,9 +68,9 @@ function angleBetween(angle, start, end, full) {
   return end >= start
     ? angle >= start && angle <= end
     : angle >= start || angle <= end;
-}
+};
 
-function doSpin() {
+const doSpin = () => {
   var surfaceContext = surface.getContext("2d");
   surfaceContext.save();
   surfaceContext.translate(wheel.width / 2, wheel.height / 2);
@@ -99,36 +99,36 @@ function doSpin() {
       }, 1000);
     }, 1000);
   }
-}
+};
 
-function degreesToRadians(degrees) {
+const degreesToRadians = degrees => {
   return (degrees * Math.PI) / 180;
-}
+};
 
-function resetWheel() {
+const resetWheel = () => {
   angle = 0;
   targetAngle = 0;
   currentAngle = 0;
   wheelState = "reset";
 
   initialDraw();
-}
+};
 
-function drawStaticWheelElements() {
+const drawStaticWheelElements = () => {
   var surfaceContext = surface.getContext("2d");
   drawGrommet(surfaceContext);
   drawPointer(surfaceContext);
-}
+};
 
-function drawGrommet(surfaceContext) {
+const drawGrommet = surfaceContext => {
   surfaceContext.fillStyle = "rgba(83,153,217,1)";
   surfaceContext.beginPath();
   surfaceContext.arc(350, 350, 10, 0, 2 * Math.PI);
   surfaceContext.closePath();
   surfaceContext.fill();
-}
+};
 
-function drawPointer(surfaceContext) {
+const drawPointer = surfaceContext => {
   var pointsX = [350, 500, 350];
   var pointsY = [360, 350, 340];
   var pointerColor = "rgba(83,153,217,0.75)";
@@ -141,4 +141,4 @@ function drawPointer(surfaceContext) {
   }
   surfaceContext.closePath();
   surfaceContext.fill();
-}
+};

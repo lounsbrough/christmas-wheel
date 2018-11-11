@@ -35,53 +35,49 @@ var giver_selected = false;
 var nbr_wheel_clicks = 0;
 var click_timeout = false;
 
-$(function() {
-  $("#select_giver").click(function() {
+$(() => {
+  $("#select_giver").click(async () => {
     if ($("#select_giver_dialog").dialog("isOpen")) {
       $("#select_giver_dialog").dialog("close");
-    } else {
-      $("#select_giver_dialog").html(
-        '<img src="images/loading_color_wheel.gif" style="height:150px">'
-      );
-      $("#select_giver_dialog").dialog("open");
-      $.get(
-        {
-          url: "ajax/load-remaining-givers.php",
-          cache: false
-        },
-        function(str) {
-          $("#select_giver_dialog").html("");
-          obj = JSON.parse(str);
-          var prop = -1;
-          for (prop in obj) {
-            $("#select_giver_dialog").append(
-              '<br><button class="select_name_button">' +
-                obj[prop]["name"] +
-                "</button><br>"
-            );
-          }
-          if (prop != -1) {
-            $("#select_giver_dialog").append("<br>");
-            window.setTimeout(function() {
-              $("#select_giver_dialog").dialog({
-                position: { my: "center", at: "center", of: "#winwheelCanvas" }
-              });
-            }, 0);
-            $(".select_name_button").button();
-            $(".select_name_button").click(function() {
-              $("#select_giver").html($(this).html());
-              giver_selected = true;
-              $("#select_giver").css({ color: "rgba(0,150,0,0.75)" });
-              $("#start_spin_button").css({ color: "rgba(0,150,0,0.75)" });
-              $("#select_giver_dialog").dialog("close");
-            });
-          } else {
-            window.location.replace(window.location);
-          }
-          $(".select_name_button").blur();
-        }
+      return;
+    }
+
+    openDialog("#select_giver_dialog");
+
+    var str = await $.get({
+      url: "ajax/load-remaining-givers.php",
+      cache: false
+    });
+
+    $("#select_giver_dialog").html("");
+    obj = JSON.parse(str);
+    var prop = -1;
+    for (prop in obj) {
+      $("#select_giver_dialog").append(
+        '<br><button class="select_name_button">' +
+          obj[prop]["name"] +
+          "</button><br>"
       );
     }
+    if (prop != -1) {
+      $("#select_giver_dialog").append("<br>");
+      window.setTimeout(function() {
+        $("#select_giver_dialog").dialog({
+          position: { my: "center", at: "center", of: "#winwheelCanvas" }
+        });
+      }, 0);
+      $(".select_name_button").button();
+      $(".select_name_button").click(function() {
+        $("#select_giver").html($(this).html());
+        giver_selected = true;
+        $("#select_giver").css({ color: "rgba(0,150,0,0.75)" });
+        $("#start_spin_button").css({ color: "rgba(0,150,0,0.75)" });
+        $("#select_giver_dialog").dialog("close");
+      });
+    } else {
+      window.location.replace(window.location);
+    }
+    $(".select_name_button").blur();
   });
 
   $(
@@ -183,7 +179,7 @@ $(function() {
     });
   }
 
-  $("#start_spin_button").click(function() {
+  $("#start_spin_button").click(async () => {
     $("#start_spin_button").button("option", "disabled", true);
     $("#select_giver").button("option", "disabled", true);
     if (giver_selected) {
@@ -201,68 +197,69 @@ $(function() {
         $("#start_spin_button").css({ color: "rgba(150,0,0,0.75)" });
       }, 30000);
       $("#select_giver_dialog").dialog("close");
-      $.get(
-        {
-          url:
-            "ajax/get-determined-prize.php?giver_name=" +
-            $("#select_giver").html(),
+
+      var getDeterminedPrizeResponse = await $.get({
+        url:
+          "ajax/get-determined-prize.php?giver_name=" +
+          $("#select_giver").html(),
+        cache: false
+      });
+
+      if (getDeterminedPrizeResponse.trim() == "giver assigned") {
+        $("#calculation_message_span").html(
+          $("#select_giver").html() + " has already spun the wheel"
+        );
+        $("#calculation_message_dialog").dialog("open");
+        window.setTimeout(function() {
+          $("#calculation_message_dialog").dialog("close");
+        }, 500);
+        $("#select_giver").html("Select Your Name");
+        $("#select_giver").css({ color: "rgba(150,0,0,0.75)" });
+        $("#start_spin_button").css({ color: "rgba(150,0,0,0.75)" });
+        $("#start_spin_button").data("calculated_target", "none");
+      } else if (getDeterminedPrizeResponse.trim() == "calculation failed") {
+        $("#calculation_message_span").html("Calculation failed");
+        $("#calculation_message_dialog").dialog("open");
+        window.setTimeout(function() {
+          $("#calculation_message_dialog").dialog("close");
+        }, 500);
+        $("#select_giver").html("Select Your Name");
+        $("#select_giver").css({ color: "rgba(150,0,0,0.75)" });
+        $("#start_spin_button").css({ color: "rgba(150,0,0,0.75)" });
+        $("#start_spin_button").data("calculated_target", "none");
+      } else {
+        determinedPrize = JSON.parse(getDeterminedPrizeResponse);
+
+        $("#start_spin_button").data(
+          "calculated_target",
+          determinedPrize.number
+        );
+
+        var loadWishListResponse = await $.get({
+          url: "ajax/load-wish-list.php?recipient_name=" + determinedPrize.name,
           cache: false
-        },
-        function(str) {
-          if (str.trim() == "giver assigned") {
-            $("#calculation_message_span").html(
-              $("#select_giver").html() + " has already spun the wheel"
-            );
-            $("#calculation_message_dialog").dialog("open");
-            window.setTimeout(function() {
-              $("#calculation_message_dialog").dialog("close");
-            }, 500);
-            $("#select_giver").html("Select Your Name");
-            $("#select_giver").css({ color: "rgba(150,0,0,0.75)" });
-            $("#start_spin_button").css({ color: "rgba(150,0,0,0.75)" });
-            $("#start_spin_button").data("calculated_target", "none");
-          } else if (str.trim() == "calculation failed") {
-            $("#calculation_message_span").html("Calculation failed");
-            $("#calculation_message_dialog").dialog("open");
-            window.setTimeout(function() {
-              $("#calculation_message_dialog").dialog("close");
-            }, 500);
-            $("#select_giver").html("Select Your Name");
-            $("#select_giver").css({ color: "rgba(150,0,0,0.75)" });
-            $("#start_spin_button").css({ color: "rgba(150,0,0,0.75)" });
-            $("#start_spin_button").data("calculated_target", "none");
-          } else {
-            obj = JSON.parse(str);
-            $.get(
-              {
-                url: "ajax/load-wish-list.php?recipient_name=" + obj.name,
-                cache: false
-              },
-              function(str) {
-                $("#display_wish_list").html(str);
-                $("#display_wish_list").prepend(
-                  '<div style="margin-top:25px;font-size:55px">You drew <span style="font-size:60px;color:#700000">' +
-                    obj.name +
-                    "</span>!</div>"
-                );
-                $("#display_wish_list").append(
-                  '<div style="margin-top:50px;margin-bottom:25px;font-size:25px">Wheel will be reset in <span id="page_reset_seconds" style="font-size:30px;color:#700000">30</span> <span id="page_reset_seconds_text">seconds</span></div>'
-                );
-              }
-            );
-            $.get({
-              url:
-                "ajax/email-wish-list.php?giver_name=" +
-                $("#select_giver").html() +
-                "&recipient_name=" +
-                obj.name,
-              cache: false
-            });
-            $("#start_spin_button").data("calculated_target", obj.number);
-          }
-          giver_selected = false;
-        }
-      );
+        });
+
+        $("#display_wish_list").html(loadWishListResponse);
+        $("#display_wish_list").prepend(
+          '<div style="margin-top:25px;font-size:55px">You drew <span style="font-size:60px;color:#700000">' +
+            determinedPrize.name +
+            "</span>!</div>"
+        );
+        $("#display_wish_list").append(
+          '<div style="margin-top:50px;margin-bottom:25px;font-size:25px">Wheel will be reset in <span id="page_reset_seconds" style="font-size:30px;color:#700000">30</span> <span id="page_reset_seconds_text">seconds</span></div>'
+        );
+
+        $.get({
+          url:
+            "ajax/email-wish-list.php?giver_name=" +
+            $("#select_giver").html() +
+            "&recipient_name=" +
+            determinedPrize.name,
+          cache: false
+        });
+      }
+      giver_selected = false;
     } else {
       $("#select_giver").button("option", "disabled", false);
       var original_button_width = $("#select_giver").outerWidth();
@@ -294,43 +291,41 @@ $(function() {
         }
       );
       if (!$("#select_giver_dialog").dialog("isOpen")) {
-        $("#select_giver_dialog").html(
-          '<img src="images/loading_color_wheel.gif" style="height:150px">'
-        );
-        $("#select_giver_dialog").dialog("open");
-        $.get({ url: "ajax/load-remaining-givers.php", cache: false }, function(
-          str
-        ) {
-          $("#select_giver_dialog").html("");
-          obj = JSON.parse(str);
-          var prop = -1;
-          for (prop in obj) {
-            $("#select_giver_dialog").append(
-              '<br><button class="select_name_button">' +
-                obj[prop]["name"] +
-                "</button><br>"
-            );
-          }
-          if (prop != -1) {
-            $("#select_giver_dialog").append("<br>");
-            window.setTimeout(function() {
-              $("#select_giver_dialog").dialog({
-                position: { my: "center", at: "center", of: "#winwheelCanvas" }
-              });
-            }, 0);
-            $(".select_name_button").button();
-            $(".select_name_button").click(function() {
-              $("#select_giver").html($(this).html());
-              giver_selected = true;
-              $("#select_giver").css({ color: "rgba(0,150,0,0.75)" });
-              $("#start_spin_button").css({ color: "rgba(0,150,0,0.75)" });
-              $("#select_giver_dialog").dialog("close");
-            });
-          } else {
-            window.location.replace(window.location);
-          }
-          $(".select_name_button").blur();
+        openDialog("#select_giver_dialog");
+
+        var loadRemainingGiversResponse = await $.get({
+          url: "ajax/load-remaining-givers.php",
+          cache: false
         });
+        $("#select_giver_dialog").html("");
+        remainingGivers = JSON.parse(loadRemainingGiversResponse);
+        var prop = -1;
+        for (prop in remainingGivers) {
+          $("#select_giver_dialog").append(
+            '<br><button class="select_name_button">' +
+              remainingGivers[prop]["name"] +
+              "</button><br>"
+          );
+        }
+        if (prop != -1) {
+          $("#select_giver_dialog").append("<br>");
+          window.setTimeout(function() {
+            $("#select_giver_dialog").dialog({
+              position: { my: "center", at: "center", of: "#winwheelCanvas" }
+            });
+          }, 0);
+          $(".select_name_button").button();
+          $(".select_name_button").click(function() {
+            $("#select_giver").html($(this).html());
+            giver_selected = true;
+            $("#select_giver").css({ color: "rgba(0,150,0,0.75)" });
+            $("#start_spin_button").css({ color: "rgba(0,150,0,0.75)" });
+            $("#select_giver_dialog").dialog("close");
+          });
+        } else {
+          window.location.replace(window.location);
+        }
+        $(".select_name_button").blur();
       }
     }
   });
@@ -384,70 +379,70 @@ $(function() {
   }, 500);
 });
 
-function count_wheel_clicks() {
+const count_wheel_clicks = async () => {
   nbr_wheel_clicks++;
   window.clearTimeout(click_timeout);
-  click_timeout = window.setTimeout(function() {
+  click_timeout = window.setTimeout(async () => {
     if (nbr_wheel_clicks == 5) {
+      openDialog("#emails_activated_status_dialog");
+      var toggleEmailActiveResponse = await $.get({
+        url: "ajax/toggle-email-active.php",
+        cache: false
+      });
+
+      $("#drawing_complete_span").css("visibility", "hidden");
       $("#emails_activated_status_dialog").html(
-        '<img src="images/loading_color_wheel.gif" style="height:150px">'
+        '<span style="line-height:300px;font-size:50px">' +
+          toggleEmailActiveResponse +
+          "</span>"
       );
-      $("#emails_activated_status_dialog").dialog("open");
-      $.get({ url: "ajax/toggle-email-active.php", cache: false }, function(
-        str
-      ) {
-        $("#drawing_complete_span").css("visibility", "hidden");
-        $("#emails_activated_status_dialog").html(
-          '<span style="line-height:300px;font-size:50px">' + str + "</span>"
-        );
-        if ($("#winwheelCanvas").length > 0) {
-          $("#emails_activated_status_dialog").dialog("option", "position", {
-            my: "center",
-            at: "center",
-            of: "#winwheelCanvas"
-          });
-        } else {
-          $("#emails_activated_status_dialog").dialog("option", "position", {
-            my: "center",
-            at: "center",
-            of: "#drawing_complete_span"
-          });
-        }
-        window.setTimeout(function() {
-          $("#emails_activated_status_dialog").dialog("close");
-        }, 500);
-      });
+      if ($("#winwheelCanvas").length > 0) {
+        $("#emails_activated_status_dialog").dialog("option", "position", {
+          my: "center",
+          at: "center",
+          of: "#winwheelCanvas"
+        });
+      } else {
+        $("#emails_activated_status_dialog").dialog("option", "position", {
+          my: "center",
+          at: "center",
+          of: "#drawing_complete_span"
+        });
+      }
+      window.setTimeout(function() {
+        $("#emails_activated_status_dialog").dialog("close");
+      }, 500);
     } else if (nbr_wheel_clicks == 10) {
-      $("#drawing_reset_dialog").html(
-        '<img src="images/loading_color_wheel.gif" style="height:150px">'
-      );
-      $("#drawing_reset_dialog").dialog("open");
-      $.get({ url: "ajax/reset-drawing.php", cache: false }, function() {
-        $("#drawing_complete_span").css("visibility", "hidden");
-        $("#drawing_reset_dialog").html(
-          '<span style="line-height:300px;font-size:50px">Drawing Has Been Reset</span>'
-        );
-        if ($("#winwheelCanvas").length > 0) {
-          $("#drawing_reset_dialog").dialog("option", "position", {
-            my: "center",
-            at: "center",
-            of: "#winwheelCanvas"
-          });
-        } else {
-          $("#drawing_reset_dialog").dialog("option", "position", {
-            my: "center",
-            at: "center",
-            of: "#drawing_complete_span"
-          });
-        }
-        window.setTimeout(function() {
-          $("#drawing_reset_dialog").dialog("close");
-        }, 500);
+      openDialog("#drawing_reset_dialog");
+      var resetDrawingResponse = await $.get({
+        url: "ajax/reset-drawing.php",
+        cache: false
       });
+
+      $("#drawing_complete_span").css("visibility", "hidden");
+      $("#drawing_reset_dialog").html(
+        '<span style="line-height:300px;font-size:50px">Drawing Has Been Reset</span>'
+      );
+      if ($("#winwheelCanvas").length > 0) {
+        $("#drawing_reset_dialog").dialog("option", "position", {
+          my: "center",
+          at: "center",
+          of: "#winwheelCanvas"
+        });
+      } else {
+        $("#drawing_reset_dialog").dialog("option", "position", {
+          my: "center",
+          at: "center",
+          of: "#drawing_complete_span"
+        });
+      }
+      window.setTimeout(function() {
+        $("#drawing_reset_dialog").dialog("close");
+      }, 500);
     }
     nbr_wheel_clicks = 0;
   }, 1000);
-}
+};
 
 function window_resize_function() {
   var width = 0;
@@ -576,3 +571,13 @@ function dummySpin() {
     initialDraw();
   }
 }
+
+const openDialog = (selector, loading = true) => {
+  $(selector).dialog("open");
+
+  if (loading) {
+    $(selector).html(
+      '<img src="images/loading_color_wheel.gif" style="height:150px">'
+    );
+  }
+};
