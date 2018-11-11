@@ -496,22 +496,11 @@ function window_resize_function() {
         Math.round((height - 120) / 2 / viewport_scale) + "px"
       );
     } else {
-      if (isMobile.any()) {
-        $("#select_name_div").css(
-          "margin-top",
-          Math.max(
-            Math.round(
-              ((height - 850 * viewport_scale) / 2) * (height / width - 1.1) * 2
-            ),
-            0
-          ) + "px"
-        );
-      } else {
-        $("#select_name_div").css(
-          "margin-top",
-          Math.max(Math.round((height - 850) / 2), 0) + "px"
-        );
-      }
+      $("#select_name_div").css(
+        "margin-top",
+        Math.max(Math.round((height - 850 * viewport_scale) / 2), 0) + "px"
+      );
+
       $("#rotate_message_div").css("display", "none");
       $("#content_wrapper_div").css("display", "block");
       $(".ui-dialog-content").css("visibility", "visible");
