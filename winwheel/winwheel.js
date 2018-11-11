@@ -60,16 +60,6 @@ const rotationalDistance = (start, end, full) => {
   return end - start + (end >= start ? 0 : full);
 };
 
-const angleBetween = (angle, start, end, full) => {
-  angle = angle % full;
-  start = start % full;
-  end = end % full;
-
-  return end >= start
-    ? angle >= start && angle <= end
-    : angle >= start || angle <= end;
-};
-
 const doSpin = () => {
   var surfaceContext = surface.getContext("2d");
   surfaceContext.save();
