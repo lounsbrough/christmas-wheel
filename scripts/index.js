@@ -26,8 +26,6 @@ var isMobile = {
 };
 
 var viewport_scale = "";
-var content = "";
-
 var dummyAngle = 10;
 var currentDummyAngle = 0;
 var calculation_timeout = "";
@@ -43,41 +41,7 @@ $(() => {
     }
 
     openDialog("#select_giver_dialog");
-
-    var str = await $.get({
-      url: "ajax/load-remaining-givers.php",
-      cache: false
-    });
-
-    $("#select_giver_dialog").html("");
-    obj = JSON.parse(str);
-    var prop = -1;
-    for (prop in obj) {
-      $("#select_giver_dialog").append(
-        '<br><button class="select_name_button">' +
-          obj[prop]["name"] +
-          "</button><br>"
-      );
-    }
-    if (prop != -1) {
-      $("#select_giver_dialog").append("<br>");
-      window.setTimeout(function() {
-        $("#select_giver_dialog").dialog({
-          position: { my: "center", at: "center", of: "#winwheelCanvas" }
-        });
-      }, 0);
-      $(".select_name_button").button();
-      $(".select_name_button").click(function() {
-        $("#select_giver").html($(this).html());
-        giver_selected = true;
-        $("#select_giver").css({ color: "rgba(0,150,0,0.75)" });
-        $("#start_spin_button").css({ color: "rgba(0,150,0,0.75)" });
-        $("#select_giver_dialog").dialog("close");
-      });
-    } else {
-      window.location.replace(window.location);
-    }
-    $(".select_name_button").blur();
+    loadSelectGiverDialog();
   });
 
   $(
@@ -179,156 +143,136 @@ $(() => {
     });
   }
 
-  $("#start_spin_button").click(async () => {
+  $("#start_spin_button").click(() => {
     $("#start_spin_button").button("option", "disabled", true);
     $("#select_giver").button("option", "disabled", true);
     if (giver_selected) {
-      $("#start_spin_button").data("calculated_target", "");
-      dummySpin();
-      calculation_timeout = window.setTimeout(function() {
-        $("#start_spin_button").data("calculated_target", "none");
-        $("#calculation_message_span").html("Calculation failed");
-        $("#calculation_message_dialog").dialog("open");
-        window.setTimeout(function() {
-          $("#calculation_message_dialog").dialog("close");
-        }, 500);
-        $("#select_giver").html("Select Your Name");
-        $("#select_giver").css({ color: "rgba(150,0,0,0.75)" });
-        $("#start_spin_button").css({ color: "rgba(150,0,0,0.75)" });
-      }, 30000);
-      $("#select_giver_dialog").dialog("close");
+      processSpinButton();
+    } else {
+      promptForGiverName();
+    }
+  });
 
-      var getDeterminedPrizeResponse = await $.get({
-        url:
-          "ajax/get-determined-prize.php?giver_name=" +
-          $("#select_giver").html(),
+  const promptForGiverName = () => {
+    $("#select_giver").button("option", "disabled", false);
+    $("#start_spin_button").button("option", "disabled", false);
+    if (!$("#select_giver_dialog").dialog("isOpen")) {
+      openDialog("#select_giver_dialog");
+      loadSelectGiverDialog();
+    }
+  };
+
+  const loadSelectGiverDialog = async () => {
+    var loadRemainingGiversResponse = await $.get({
+      url: "ajax/load-remaining-givers.php",
+      cache: false
+    });
+    $("#select_giver_dialog").html("");
+    remainingGivers = JSON.parse(loadRemainingGiversResponse);
+    var prop = -1;
+    for (prop in remainingGivers) {
+      $("#select_giver_dialog").append(
+        '<br><button class="select_name_button">' +
+          remainingGivers[prop]["name"] +
+          "</button><br>"
+      );
+    }
+    if (prop != -1) {
+      $("#select_giver_dialog").append("<br>");
+      window.setTimeout(function() {
+        $("#select_giver_dialog").dialog({
+          position: { my: "center", at: "center", of: "#winwheelCanvas" }
+        });
+      }, 0);
+      $(".select_name_button").button();
+      $(".select_name_button").click(function() {
+        $("#select_giver").html($(this).html());
+        giver_selected = true;
+        $("#select_giver").css({ color: "rgba(0,150,0,0.75)" });
+        $("#start_spin_button").css({ color: "rgba(0,150,0,0.75)" });
+        $("#select_giver_dialog").dialog("close");
+      });
+    } else {
+      window.location.replace(window.location);
+    }
+    $(".select_name_button").blur();
+  };
+
+  const processSpinButton = async () => {
+    $("#start_spin_button").data("calculated_target", "");
+    dummySpin();
+    calculation_timeout = window.setTimeout(function() {
+      $("#start_spin_button").data("calculated_target", "none");
+      $("#calculation_message_span").html("Calculation failed");
+      $("#calculation_message_dialog").dialog("open");
+      window.setTimeout(function() {
+        $("#calculation_message_dialog").dialog("close");
+      }, 500);
+      $("#select_giver").html("Select Your Name");
+      $("#select_giver").css({ color: "rgba(150,0,0,0.75)" });
+      $("#start_spin_button").css({ color: "rgba(150,0,0,0.75)" });
+    }, 30000);
+    $("#select_giver_dialog").dialog("close");
+
+    var getDeterminedPrizeResponse = await $.get({
+      url:
+        "ajax/get-determined-prize.php?giver_name=" + $("#select_giver").html(),
+      cache: false
+    });
+
+    if (getDeterminedPrizeResponse.trim() == "giver assigned") {
+      $("#calculation_message_span").html(
+        $("#select_giver").html() + " has already spun the wheel"
+      );
+      $("#calculation_message_dialog").dialog("open");
+      window.setTimeout(function() {
+        $("#calculation_message_dialog").dialog("close");
+      }, 500);
+      $("#select_giver").html("Select Your Name");
+      $("#select_giver").css({ color: "rgba(150,0,0,0.75)" });
+      $("#start_spin_button").css({ color: "rgba(150,0,0,0.75)" });
+      $("#start_spin_button").data("calculated_target", "none");
+    } else if (getDeterminedPrizeResponse.trim() == "calculation failed") {
+      $("#calculation_message_span").html("Calculation failed");
+      $("#calculation_message_dialog").dialog("open");
+      window.setTimeout(function() {
+        $("#calculation_message_dialog").dialog("close");
+      }, 500);
+      $("#select_giver").html("Select Your Name");
+      $("#select_giver").css({ color: "rgba(150,0,0,0.75)" });
+      $("#start_spin_button").css({ color: "rgba(150,0,0,0.75)" });
+      $("#start_spin_button").data("calculated_target", "none");
+    } else {
+      determinedPrize = JSON.parse(getDeterminedPrizeResponse);
+
+      $("#start_spin_button").data("calculated_target", determinedPrize.number);
+
+      var loadWishListResponse = await $.get({
+        url: "ajax/load-wish-list.php?recipient_name=" + determinedPrize.name,
         cache: false
       });
 
-      if (getDeterminedPrizeResponse.trim() == "giver assigned") {
-        $("#calculation_message_span").html(
-          $("#select_giver").html() + " has already spun the wheel"
-        );
-        $("#calculation_message_dialog").dialog("open");
-        window.setTimeout(function() {
-          $("#calculation_message_dialog").dialog("close");
-        }, 500);
-        $("#select_giver").html("Select Your Name");
-        $("#select_giver").css({ color: "rgba(150,0,0,0.75)" });
-        $("#start_spin_button").css({ color: "rgba(150,0,0,0.75)" });
-        $("#start_spin_button").data("calculated_target", "none");
-      } else if (getDeterminedPrizeResponse.trim() == "calculation failed") {
-        $("#calculation_message_span").html("Calculation failed");
-        $("#calculation_message_dialog").dialog("open");
-        window.setTimeout(function() {
-          $("#calculation_message_dialog").dialog("close");
-        }, 500);
-        $("#select_giver").html("Select Your Name");
-        $("#select_giver").css({ color: "rgba(150,0,0,0.75)" });
-        $("#start_spin_button").css({ color: "rgba(150,0,0,0.75)" });
-        $("#start_spin_button").data("calculated_target", "none");
-      } else {
-        determinedPrize = JSON.parse(getDeterminedPrizeResponse);
-
-        $("#start_spin_button").data(
-          "calculated_target",
-          determinedPrize.number
-        );
-
-        var loadWishListResponse = await $.get({
-          url: "ajax/load-wish-list.php?recipient_name=" + determinedPrize.name,
-          cache: false
-        });
-
-        $("#display_wish_list").html(loadWishListResponse);
-        $("#display_wish_list").prepend(
-          '<div style="margin-top:25px;font-size:55px">You drew <span style="font-size:60px;color:#700000">' +
-            determinedPrize.name +
-            "</span>!</div>"
-        );
-        $("#display_wish_list").append(
-          '<div style="margin-top:50px;margin-bottom:25px;font-size:25px">Wheel will be reset in <span id="page_reset_seconds" style="font-size:30px;color:#700000">30</span> <span id="page_reset_seconds_text">seconds</span></div>'
-        );
-
-        $.get({
-          url:
-            "ajax/email-wish-list.php?giver_name=" +
-            $("#select_giver").html() +
-            "&recipient_name=" +
-            determinedPrize.name,
-          cache: false
-        });
-      }
-      giver_selected = false;
-    } else {
-      $("#select_giver").button("option", "disabled", false);
-      var original_button_width = $("#select_giver").outerWidth();
-      var original_button_height = $("#select_giver").outerHeight();
-      $("#select_giver").animate(
-        {
-          width: Math.round(original_button_width * 1.5) + "px",
-          height: Math.round(original_button_height * 1.5) + "px",
-          "font-size": "37px"
-        },
-        1000,
-        "swing",
-        function() {
-          $("#select_giver").animate(
-            {
-              width: original_button_width + "px",
-              height: original_button_height + "px",
-              "font-size": "25px"
-            },
-            1000,
-            "swing",
-            function() {
-              $("#select_giver_dialog").dialog({
-                position: { my: "center", at: "center", of: "#winwheelCanvas" }
-              });
-              $("#start_spin_button").button("option", "disabled", false);
-            }
-          );
-        }
+      $("#display_wish_list").html(loadWishListResponse);
+      $("#display_wish_list").prepend(
+        '<div style="margin-top:25px;font-size:55px">You drew <span style="font-size:60px;color:#700000">' +
+          determinedPrize.name +
+          "</span>!</div>"
       );
-      if (!$("#select_giver_dialog").dialog("isOpen")) {
-        openDialog("#select_giver_dialog");
+      $("#display_wish_list").append(
+        '<div style="margin-top:50px;margin-bottom:25px;font-size:25px">Wheel will be reset in <span id="page_reset_seconds" style="font-size:30px;color:#700000">30</span> <span id="page_reset_seconds_text">seconds</span></div>'
+      );
 
-        var loadRemainingGiversResponse = await $.get({
-          url: "ajax/load-remaining-givers.php",
-          cache: false
-        });
-        $("#select_giver_dialog").html("");
-        remainingGivers = JSON.parse(loadRemainingGiversResponse);
-        var prop = -1;
-        for (prop in remainingGivers) {
-          $("#select_giver_dialog").append(
-            '<br><button class="select_name_button">' +
-              remainingGivers[prop]["name"] +
-              "</button><br>"
-          );
-        }
-        if (prop != -1) {
-          $("#select_giver_dialog").append("<br>");
-          window.setTimeout(function() {
-            $("#select_giver_dialog").dialog({
-              position: { my: "center", at: "center", of: "#winwheelCanvas" }
-            });
-          }, 0);
-          $(".select_name_button").button();
-          $(".select_name_button").click(function() {
-            $("#select_giver").html($(this).html());
-            giver_selected = true;
-            $("#select_giver").css({ color: "rgba(0,150,0,0.75)" });
-            $("#start_spin_button").css({ color: "rgba(0,150,0,0.75)" });
-            $("#select_giver_dialog").dialog("close");
-          });
-        } else {
-          window.location.replace(window.location);
-        }
-        $(".select_name_button").blur();
-      }
+      $.get({
+        url:
+          "ajax/email-wish-list.php?giver_name=" +
+          $("#select_giver").html() +
+          "&recipient_name=" +
+          determinedPrize.name,
+        cache: false
+      });
     }
-  });
+    giver_selected = false;
+  };
 
   $("#winwheelCanvas").click(function() {
     count_wheel_clicks();
@@ -351,7 +295,7 @@ $(() => {
   } else {
     viewport_scale = 1;
   }
-  content =
+  var content =
     "initial-scale=" +
     viewport_scale +
     ",user-scalable=no,maximum-scale=3,width=device-width,height=device-height";
