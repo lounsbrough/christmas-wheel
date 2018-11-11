@@ -1,3 +1,6 @@
+html {
+  min-height: 100vh;
+}
 .transparentDialogRounded .ui-dialog-titlebar {
   display: none;
   -moz-opacity: 0.5;

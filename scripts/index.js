@@ -285,16 +285,12 @@ $(() => {
     initializeWheel();
   }
 
-  if (isMobile.any()) {
-    if (window.screen.availHeight > window.screen.availWidth) {
-      viewport_scale = Math.floor((window.screen.availWidth / 800) * 100) / 100;
-    } else {
-      viewport_scale =
-        Math.floor((window.screen.availHeight / 800) * 100) / 100;
-    }
+  if (window.screen.availHeight > window.screen.availWidth) {
+    viewport_scale = Math.floor((window.screen.availWidth / 800) * 100) / 100;
   } else {
-    viewport_scale = 1;
+    viewport_scale = Math.floor((window.screen.availHeight / 800) * 100) / 100;
   }
+
   var content =
     "initial-scale=" +
     viewport_scale +
@@ -403,21 +399,6 @@ function window_resize_function() {
     width = $(window).width();
     height = $(window).height();
   }
-  var image_size = "";
-  if (width / height > 1.6) {
-    image_size =
-      Math.round(width / viewport_scale) +
-      "px " +
-      Math.round(width / viewport_scale / 1.6) +
-      "px";
-  } else {
-    image_size =
-      Math.round((height / viewport_scale) * 1.6) +
-      "px " +
-      Math.round(height / viewport_scale) +
-      "px";
-  }
-  $("body").css("background-size", image_size);
   if ($("#content_wrapper_div").length > 0) {
     $("#select_name_div").css(
       "margin-top",

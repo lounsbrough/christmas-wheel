@@ -8,7 +8,7 @@
 <link rel='shortcut icon' type='image/x-icon' href='christmas-tree.ico' />
 <meta name="mobile-web-app-capable" content="yes">
 
-<link rel="stylesheet" href="css/main.css"/>
+<link rel="stylesheet" href="css/main.css?tms=<?php echo filemtime("css/main.css"); ?>"/>
 
 <script>
     window.people = <?= file_get_contents("control-files/people.json") ?>;
@@ -24,7 +24,7 @@
 
 </head>
 
-<body style="background-image:url('images/glass-bubbles.jpg');background-repeat:no-repeat">
+<body style="background-image:url('images/glass-bubbles.jpg'); background-repeat:no-repeat; background-size:cover">
 
 <?PHP
 
