@@ -17,80 +17,7 @@ $(() => {
     loadSelectGiverDialog();
   });
 
-  $(
-    '<div id="select_giver_dialog" style="color:#333333;text-align:center"><span style="line-height:300px;font-size:50px">You did not select your name</span></div>'
-  ).dialog({
-    autoOpen: false,
-    minWidth: "200",
-    minHeight: "0",
-    dialogClass: "transparentDialogRounded",
-    hide: { effect: "fade", duration: 500 },
-    position: { my: "center", at: "center", of: "#winwheelCanvas" }
-  });
-
-  $(
-    '<div id="no_select_giver_dialog" style="color:#333333;text-align:center"><span style="line-height:300px;font-size:50px">Please select your name</span></div>'
-  ).dialog({
-    autoOpen: false,
-    minWidth: "700",
-    minHeight: "300",
-    dialogClass: "transparentDialogRounded",
-    hide: { effect: "drop", duration: 5000, direction: "up" },
-    position: { my: "center", at: "center", of: "#winwheelCanvas" },
-    close: function() {
-      $("#start_spin_button").button("option", "disabled", false);
-    }
-  });
-
-  $(
-    '<div id="calculation_message_dialog" style="color:#333333;text-align:center"><span id="calculation_message_span" style="line-height:300px;font-size:35px"></span></div>'
-  ).dialog({
-    autoOpen: false,
-    minWidth: "700",
-    minHeight: "300",
-    dialogClass: "transparentDialogRounded",
-    hide: { effect: "drop", duration: 5000, direction: "up" },
-    position: { my: "center", at: "center", of: "#winwheelCanvas" },
-    close: function() {
-      $("#select_giver").button("option", "disabled", false);
-      $("#start_spin_button").button("option", "disabled", false);
-    }
-  });
-
-  $(
-    '<div id="display_wish_list" style="color:#333333;text-align:center"></div>'
-  ).dialog({
-    autoOpen: false,
-    minWidth: "700",
-    minHeight: "300",
-    dialogClass: "transparentDialogRounded",
-    hide: { effect: "fade", duration: 1000, direction: "up" },
-    position: { my: "center", at: "center", of: "#winwheelCanvas" }
-  });
-
-  $(
-    '<div id="emails_activated_status_dialog" style="color:#333333;text-align:center"></div>'
-  ).dialog({
-    autoOpen: false,
-    minWidth: "700",
-    dialogClass: "transparentDialogRounded",
-    hide: { effect: "fade", duration: 2000, direction: "up" },
-    close: function() {
-      $("#drawing_complete_span").css("visibility", "visible");
-    }
-  });
-
-  $(
-    '<div id="drawing_reset_dialog" style="color:#333333;text-align:center"></div>'
-  ).dialog({
-    autoOpen: false,
-    minWidth: "700",
-    dialogClass: "transparentDialogRounded",
-    hide: { effect: "fade", duration: 2000, direction: "up" },
-    close: function() {
-      window.location.replace(window.location);
-    }
-  });
+  defineDialogs();
 
   if ($("#winwheelCanvas").length > 0) {
     $("#emails_activated_status_dialog").dialog("option", "position", {
@@ -126,127 +53,6 @@ $(() => {
     }
   });
 
-  const promptForGiverName = () => {
-    $("#select_giver").button("option", "disabled", false);
-    $("#start_spin_button").button("option", "disabled", false);
-    if (!$("#select_giver_dialog").dialog("isOpen")) {
-      openDialog("#select_giver_dialog");
-      loadSelectGiverDialog();
-    }
-  };
-
-  const loadSelectGiverDialog = async () => {
-    var loadRemainingGiversResponse = await $.get({
-      url: "ajax/load-remaining-givers.php",
-      cache: false
-    });
-    $("#select_giver_dialog").html("");
-    remainingGivers = JSON.parse(loadRemainingGiversResponse);
-    var prop = -1;
-    for (prop in remainingGivers) {
-      $("#select_giver_dialog").append(
-        '<br><button class="select_name_button">' +
-          remainingGivers[prop]["name"] +
-          "</button><br>"
-      );
-    }
-    if (prop != -1) {
-      $("#select_giver_dialog").append("<br>");
-      window.setTimeout(function() {
-        $("#select_giver_dialog").dialog({
-          position: { my: "center", at: "center", of: "#winwheelCanvas" }
-        });
-      }, 0);
-      $(".select_name_button").button();
-      $(".select_name_button").click(function() {
-        $("#select_giver").html($(this).html());
-        giverSelected = true;
-        $("#select_giver").css({ color: "rgba(0,150,0,0.75)" });
-        $("#start_spin_button").css({ color: "rgba(0,150,0,0.75)" });
-        $("#select_giver_dialog").dialog("close");
-      });
-    } else {
-      window.location.replace(window.location);
-    }
-    $(".select_name_button").blur();
-  };
-
-  const processSpinButton = async () => {
-    $("#start_spin_button").data("calculated_target", "");
-    dummySpin();
-    calculationTimeout = window.setTimeout(function() {
-      $("#start_spin_button").data("calculated_target", "none");
-      $("#calculation_message_span").html("Calculation failed");
-      $("#calculation_message_dialog").dialog("open");
-      window.setTimeout(function() {
-        $("#calculation_message_dialog").dialog("close");
-      }, 500);
-      $("#select_giver").html("Select Your Name");
-      $("#select_giver").css({ color: "rgba(150,0,0,0.75)" });
-      $("#start_spin_button").css({ color: "rgba(150,0,0,0.75)" });
-    }, 30000);
-    $("#select_giver_dialog").dialog("close");
-
-    var getDeterminedPrizeResponse = await $.get({
-      url:
-        "ajax/get-determined-prize.php?giver_name=" + $("#select_giver").html(),
-      cache: false
-    });
-
-    if (getDeterminedPrizeResponse.trim() == "giver assigned") {
-      $("#calculation_message_span").html(
-        $("#select_giver").html() + " has already spun the wheel"
-      );
-      $("#calculation_message_dialog").dialog("open");
-      window.setTimeout(function() {
-        $("#calculation_message_dialog").dialog("close");
-      }, 500);
-      $("#select_giver").html("Select Your Name");
-      $("#select_giver").css({ color: "rgba(150,0,0,0.75)" });
-      $("#start_spin_button").css({ color: "rgba(150,0,0,0.75)" });
-      $("#start_spin_button").data("calculated_target", "none");
-    } else if (getDeterminedPrizeResponse.trim() == "calculation failed") {
-      $("#calculation_message_span").html("Calculation failed");
-      $("#calculation_message_dialog").dialog("open");
-      window.setTimeout(function() {
-        $("#calculation_message_dialog").dialog("close");
-      }, 500);
-      $("#select_giver").html("Select Your Name");
-      $("#select_giver").css({ color: "rgba(150,0,0,0.75)" });
-      $("#start_spin_button").css({ color: "rgba(150,0,0,0.75)" });
-      $("#start_spin_button").data("calculated_target", "none");
-    } else {
-      determinedPrize = JSON.parse(getDeterminedPrizeResponse);
-
-      $("#start_spin_button").data("calculated_target", determinedPrize.number);
-
-      var loadWishListResponse = await $.get({
-        url: "ajax/load-wish-list.php?recipient_name=" + determinedPrize.name,
-        cache: false
-      });
-
-      $("#display_wish_list").html(loadWishListResponse);
-      $("#display_wish_list").prepend(
-        '<div style="margin-top:25px;font-size:55px">You drew <span style="font-size:60px;color:#700000">' +
-          determinedPrize.name +
-          "</span>!</div>"
-      );
-      $("#display_wish_list").append(
-        '<div style="margin-top:50px;margin-bottom:25px;font-size:25px">Wheel will be reset in <span id="page_reset_seconds" style="font-size:30px;color:#700000">30</span> <span id="page_reset_seconds_text">seconds</span></div>'
-      );
-
-      $.get({
-        url:
-          "ajax/email-wish-list.php?giver_name=" +
-          $("#select_giver").html() +
-          "&recipient_name=" +
-          determinedPrize.name,
-        cache: false
-      });
-    }
-    giverSelected = false;
-  };
-
   $("#winwheelCanvas").click(function() {
     countWheelClicks();
   });
@@ -279,18 +85,129 @@ $(() => {
 
   $("#select_giver")
     .button()
-    .css({ color: "rgba(150,0,0,0.75)" });
-  $("#select_giver").css("visibility", "visible");
+    .css("visibility", "visible");
   $("#start_spin_button")
     .button()
-    .css({ color: "rgba(150,0,0,0.75)" });
-  $("#start_spin_button").css("visibility", "visible");
+    .css("visibility", "visible");
 
   windowResizeFunction();
   window.setTimeout(function() {
     windowResizeFunction();
   }, 500);
 });
+
+const promptForGiverName = () => {
+  $("#select_giver").button("option", "disabled", false);
+  $("#start_spin_button").button("option", "disabled", false);
+  if (!$("#select_giver_dialog").dialog("isOpen")) {
+    openDialog("#select_giver_dialog");
+    loadSelectGiverDialog();
+  }
+};
+
+const loadSelectGiverDialog = async () => {
+  var loadRemainingGiversResponse = await $.get({
+    url: "ajax/load-remaining-givers.php",
+    cache: false
+  });
+  $("#select_giver_dialog").html("");
+  remainingGivers = JSON.parse(loadRemainingGiversResponse);
+  var prop = -1;
+  for (prop in remainingGivers) {
+    $("#select_giver_dialog").append(
+      '<br><button class="select_name_button">' +
+        remainingGivers[prop]["name"] +
+        "</button><br>"
+    );
+  }
+  if (prop != -1) {
+    $("#select_giver_dialog").append("<br>");
+    window.setTimeout(function() {
+      $("#select_giver_dialog").dialog({
+        position: { my: "center", at: "center", of: "#winwheelCanvas" }
+      });
+    }, 0);
+    $(".select_name_button").button();
+    $(".select_name_button").click(function() {
+      $("#select_giver").html($(this).html());
+      giverSelected = true;
+      $("#select_giver_dialog").dialog("close");
+    });
+  } else {
+    window.location.replace(window.location);
+  }
+  $(".select_name_button").blur();
+};
+
+const processSpinButton = async () => {
+  $("#start_spin_button").data("calculated_target", "");
+  dummySpin();
+  calculationTimeout = window.setTimeout(function() {
+    $("#start_spin_button").data("calculated_target", "none");
+    $("#calculation_message_span").html("Calculation failed");
+    $("#calculation_message_dialog").dialog("open");
+    window.setTimeout(function() {
+      $("#calculation_message_dialog").dialog("close");
+    }, 500);
+    $("#select_giver").html("Select Your Name");
+  }, 30000);
+  $("#select_giver_dialog").dialog("close");
+
+  var getDeterminedPrizeResponse = await $.get({
+    url:
+      "ajax/get-determined-prize.php?giver_name=" + $("#select_giver").html(),
+    cache: false
+  });
+
+  if (getDeterminedPrizeResponse.trim() == "giver assigned") {
+    $("#calculation_message_span").html(
+      $("#select_giver").html() + " has already spun the wheel"
+    );
+    $("#calculation_message_dialog").dialog("open");
+    window.setTimeout(function() {
+      $("#calculation_message_dialog").dialog("close");
+    }, 500);
+    $("#select_giver").html("Select Your Name");
+    $("#start_spin_button").data("calculated_target", "none");
+  } else if (getDeterminedPrizeResponse.trim() == "calculation failed") {
+    $("#calculation_message_span").html("Calculation failed");
+    $("#calculation_message_dialog").dialog("open");
+    window.setTimeout(function() {
+      $("#calculation_message_dialog").dialog("close");
+    }, 500);
+    $("#select_giver").html("Select Your Name");
+    $("#start_spin_button").data("calculated_target", "none");
+  } else {
+    determinedPrize = JSON.parse(getDeterminedPrizeResponse);
+
+    $("#start_spin_button").data("calculated_target", determinedPrize.number);
+
+    var loadWishListResponse = await $.get({
+      url: "ajax/load-wish-list.php?recipient_name=" + determinedPrize.name,
+      cache: false
+    });
+
+    $("#display_wish_list").html(loadWishListResponse);
+    $("#display_wish_list").prepend(
+      '<div style="margin-top:25px;font-size:55px">You drew <span style="font-size:60px;color:#700000">' +
+        determinedPrize.name +
+        "</span>!</div>"
+    );
+    $("#display_wish_list").append(
+      '<div style="margin-top:50px;margin-bottom:25px;font-size:25px">Wheel will be reset in <span id="page_reset_seconds" style="font-size:30px;color:#700000">30</span> <span id="page_reset_seconds_text">seconds</span></div>'
+    );
+
+    $.get({
+      url:
+        "ajax/email-wish-list.php?giver_name=" +
+        $("#select_giver").html() +
+        "&recipient_name=" +
+        determinedPrize.name,
+      cache: false
+    });
+  }
+  giverSelected = false;
+};
 
 const countWheelClicks = async () => {
   numberWheelClicks++;
@@ -357,9 +274,80 @@ const countWheelClicks = async () => {
   }, 1000);
 };
 
+function defineDialogs() {
+  $(
+    '<div id="select_giver_dialog" style="color:#333333;text-align:center"><span style="line-height:300px;font-size:50px">You did not select your name</span></div>'
+  ).dialog({
+    autoOpen: false,
+    minWidth: "200",
+    minHeight: "0",
+    dialogClass: "transparentDialogRounded",
+    hide: { effect: "fade", duration: 500 },
+    position: { my: "center", at: "center", of: "#winwheelCanvas" }
+  });
+  $(
+    '<div id="no_select_giver_dialog" style="color:#333333;text-align:center"><span style="line-height:300px;font-size:50px">Please select your name</span></div>'
+  ).dialog({
+    autoOpen: false,
+    minWidth: "700",
+    minHeight: "300",
+    dialogClass: "transparentDialogRounded",
+    hide: { effect: "drop", duration: 5000, direction: "up" },
+    position: { my: "center", at: "center", of: "#winwheelCanvas" },
+    close: function() {
+      $("#start_spin_button").button("option", "disabled", false);
+    }
+  });
+  $(
+    '<div id="calculation_message_dialog" style="color:#333333;text-align:center"><span id="calculation_message_span" style="line-height:300px;font-size:35px"></span></div>'
+  ).dialog({
+    autoOpen: false,
+    minWidth: "700",
+    minHeight: "300",
+    dialogClass: "transparentDialogRounded",
+    hide: { effect: "drop", duration: 5000, direction: "up" },
+    position: { my: "center", at: "center", of: "#winwheelCanvas" },
+    close: function() {
+      $("#select_giver").button("option", "disabled", false);
+      $("#start_spin_button").button("option", "disabled", false);
+    }
+  });
+  $(
+    '<div id="display_wish_list" style="color:#333333;text-align:center"></div>'
+  ).dialog({
+    autoOpen: false,
+    minWidth: "700",
+    minHeight: "300",
+    dialogClass: "transparentDialogRounded",
+    hide: { effect: "fade", duration: 1000, direction: "up" },
+    position: { my: "center", at: "center", of: "#winwheelCanvas" }
+  });
+  $(
+    '<div id="emails_activated_status_dialog" style="color:#333333;text-align:center"></div>'
+  ).dialog({
+    autoOpen: false,
+    minWidth: "700",
+    dialogClass: "transparentDialogRounded",
+    hide: { effect: "fade", duration: 2000, direction: "up" },
+    close: function() {
+      $("#drawing_complete_span").css("visibility", "visible");
+    }
+  });
+  $(
+    '<div id="drawing_reset_dialog" style="color:#333333;text-align:center"></div>'
+  ).dialog({
+    autoOpen: false,
+    minWidth: "700",
+    dialogClass: "transparentDialogRounded",
+    hide: { effect: "fade", duration: 2000, direction: "up" },
+    close: function() {
+      window.location.replace(window.location);
+    }
+  });
+}
+
 function windowResizeFunction() {
   var height = window.screen.availHeight;
-  //height = $(window).outerHeight();
 
   if ($("#content_wrapper_div").length > 0) {
     $("#select_name_div").css(
