@@ -18,6 +18,10 @@ var prizes = window.people.map((person, i) => {
 const initializeWheel = () => {
   surface = document.getElementById(canvasId);
 
+  if (surface === null) {
+    return;
+  }
+
   if (surface.getContext) {
     wheel = new Image();
     wheel.width = "700";

@@ -37,13 +37,13 @@ if (!empty($unassignedGivers)) {
 ?>
 	<div id="content_wrapper_div" style="min-width:700px">
 	    <div id="select_name_div" style="text-align:center;font-size:25px;margin-top:10px">
-            <button id="select_giver" style="font-size:25px;visibility:hidden;white-space:nowrap">Select Your Name</button>
+            <button id="select_giver" style="font-size:25px;display:none;white-space:nowrap"></button>
         </div>
 	    <div style="text-align:center">
             <canvas id="winwheelCanvas" width="700px" height="700px" style="margin-top:25px"></canvas>
         </div>
 	    <div style="text-align:center;margin-top:25px;margin-bottom:25px">
-            <button id="start_spin_button" style="font-size:25px;visibility:hidden">Spin!</button>
+            <button id="start_spin_button" style="font-size:25px;display:none">Spin!</button>
         </div>
     </div>
 <?php

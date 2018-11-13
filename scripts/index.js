@@ -1,57 +1,19 @@
-var viewportScale = "";
-var dummyAngle = 10;
-var currentDummyAngle = 0;
-var calculationTimeout = "";
-var giverSelected = false;
-var numberWheelClicks = 0;
-var clickTimeout = false;
+let viewportScale = "";
+let dummyAngle = 10;
+let currentDummyAngle = 0;
+let calculationTimeout = "";
+let giverSelected = false;
+let numberWheelClicks = 0;
+let clickTimeout = false;
+
+const defaultGiverSelectButtonText = "Select Your Name";
 
 $(() => {
-  $("#select_giver").click(async () => {
-    if ($("#select_giver_dialog").dialog("isOpen")) {
-      $("#select_giver_dialog").dialog("close");
-      return;
-    }
-
-    openDialog("#select_giver_dialog");
-    loadSelectGiverDialog();
-  });
-
+  calculateViewportScale();
   defineDialogs();
-
-  if ($("#winwheelCanvas").length > 0) {
-    $("#emails_activated_status_dialog").dialog("option", "position", {
-      my: "center",
-      at: "center",
-      of: "#winwheelCanvas"
-    });
-    $("#drawing_reset_dialog").dialog("option", "position", {
-      my: "center",
-      at: "center",
-      of: "#winwheelCanvas"
-    });
-  } else {
-    $("#emails_activated_status_dialog").dialog("option", "position", {
-      my: "center",
-      at: "center",
-      of: "#drawing_complete_span"
-    });
-    $("#drawing_reset_dialog").dialog("option", "position", {
-      my: "center",
-      at: "center",
-      of: "#drawing_complete_span"
-    });
-  }
-
-  $("#start_spin_button").click(() => {
-    $("#start_spin_button").button("option", "disabled", true);
-    $("#select_giver").button("option", "disabled", true);
-    if (giverSelected) {
-      processSpinButton();
-    } else {
-      promptForGiverName();
-    }
-  });
+  selectGiverClickHandler();
+  startSpinButtonClickHandler();
+  initializeWheel();
 
   $("#winwheelCanvas").click(function() {
     countWheelClicks();
@@ -60,40 +22,16 @@ $(() => {
     countWheelClicks();
   });
 
-  if ($("#content_wrapper_div").length > 0) {
-    initializeWheel();
-  }
-
-  if (window.screen.availHeight > window.screen.availWidth) {
-    viewportScale = Math.floor((window.screen.availWidth / 800) * 100) / 100;
-  } else {
-    viewportScale = Math.floor((window.screen.availHeight / 800) * 100) / 100;
-  }
-
-  var content =
-    "initial-scale=" +
-    viewportScale +
-    ",user-scalable=no,maximum-scale=3,width=device-width,height=device-height";
-  $("head").append('<meta name="viewport" content="' + content + '">');
-
-  $(window).resize(function() {
-    windowResizeFunction();
-    window.setTimeout(function() {
-      windowResizeFunction();
-    }, 500);
-  });
-
   $("#select_giver")
     .button()
-    .css("visibility", "visible");
+    .html(defaultGiverSelectButtonText)
+    .show();
   $("#start_spin_button")
     .button()
-    .css("visibility", "visible");
+    .show();
 
-  windowResizeFunction();
-  window.setTimeout(function() {
-    windowResizeFunction();
-  }, 500);
+  windowResizeHandler();
+  $(window).trigger("resize");
 });
 
 const promptForGiverName = () => {
@@ -149,7 +87,7 @@ const processSpinButton = async () => {
     window.setTimeout(function() {
       $("#calculation_message_dialog").dialog("close");
     }, 500);
-    $("#select_giver").html("Select Your Name");
+    $("#select_giver").html(defaultGiverSelectButtonText);
   }, 30000);
   $("#select_giver_dialog").dialog("close");
 
@@ -167,7 +105,7 @@ const processSpinButton = async () => {
     window.setTimeout(function() {
       $("#calculation_message_dialog").dialog("close");
     }, 500);
-    $("#select_giver").html("Select Your Name");
+    $("#select_giver").html(defaultGiverSelectButtonText);
     $("#start_spin_button").data("calculated_target", "none");
   } else if (getDeterminedPrizeResponse.trim() == "calculation failed") {
     $("#calculation_message_span").html("Calculation failed");
@@ -175,7 +113,7 @@ const processSpinButton = async () => {
     window.setTimeout(function() {
       $("#calculation_message_dialog").dialog("close");
     }, 500);
-    $("#select_giver").html("Select Your Name");
+    $("#select_giver").html(defaultGiverSelectButtonText);
     $("#start_spin_button").data("calculated_target", "none");
   } else {
     determinedPrize = JSON.parse(getDeterminedPrizeResponse);
@@ -274,7 +212,7 @@ const countWheelClicks = async () => {
   }, 1000);
 };
 
-function defineDialogs() {
+const defineDialogs = () => {
   $(
     '<div id="select_giver_dialog" style="color:#333333;text-align:center"><span style="line-height:300px;font-size:50px">You did not select your name</span></div>'
   ).dialog({
@@ -344,10 +282,34 @@ function defineDialogs() {
       window.location.replace(window.location);
     }
   });
-}
 
-function windowResizeFunction() {
-  var height = window.screen.availHeight;
+  if ($("#winwheelCanvas").length > 0) {
+    $("#emails_activated_status_dialog").dialog("option", "position", {
+      my: "center",
+      at: "center",
+      of: "#winwheelCanvas"
+    });
+    $("#drawing_reset_dialog").dialog("option", "position", {
+      my: "center",
+      at: "center",
+      of: "#winwheelCanvas"
+    });
+  } else {
+    $("#emails_activated_status_dialog").dialog("option", "position", {
+      my: "center",
+      at: "center",
+      of: "#drawing_complete_span"
+    });
+    $("#drawing_reset_dialog").dialog("option", "position", {
+      my: "center",
+      at: "center",
+      of: "#drawing_complete_span"
+    });
+  }
+};
+
+const windowResizeFunction = () => {
+  const height = window.screen.availHeight;
 
   if ($("#content_wrapper_div").length > 0) {
     $("#select_name_div").css(
@@ -368,25 +330,25 @@ function windowResizeFunction() {
       Math.round((height - 120) / 2 / viewportScale) + "px"
     );
   }
-}
+};
 
-function resetPageCounter() {
-  var seconds = $("#page_reset_seconds").html();
+const resetPageCounter = () => {
+  let seconds = $("#page_reset_seconds").html();
   seconds--;
   $("#page_reset_seconds").html(seconds);
   if (seconds == 1) {
     $("#page_reset_seconds_text").html("second");
-    window.setTimeout(function() {
+    window.setTimeout(() => {
       window.location.replace(window.location);
     }, 1000);
   } else {
-    window.setTimeout(function() {
+    window.setTimeout(() => {
       resetPageCounter();
     }, 1000);
   }
-}
+};
 
-function dummySpin() {
+const dummySpin = () => {
   if (
     $("#start_spin_button").data("calculated_target") === "" ||
     dummyAngle < 20
@@ -411,7 +373,7 @@ function dummySpin() {
     window.clearTimeout(calculationTimeout);
     initialDraw();
   }
-}
+};
 
 const openDialog = (selector, loading = true) => {
   $(selector).dialog("open");
@@ -421,4 +383,50 @@ const openDialog = (selector, loading = true) => {
       '<img src="images/loading_color_wheel.gif" style="height:150px">'
     );
   }
+};
+
+const selectGiverClickHandler = () => {
+  $("#select_giver").click(async () => {
+    if ($("#select_giver_dialog").dialog("isOpen")) {
+      $("#select_giver_dialog").dialog("close");
+      return;
+    }
+    openDialog("#select_giver_dialog");
+    loadSelectGiverDialog();
+  });
+};
+
+const startSpinButtonClickHandler = () => {
+  $("#start_spin_button").click(() => {
+    $("#start_spin_button").button("option", "disabled", true);
+    $("#select_giver").button("option", "disabled", true);
+    if (giverSelected) {
+      processSpinButton();
+    } else {
+      promptForGiverName();
+    }
+  });
+};
+
+const calculateViewportScale = () => {
+  if (window.screen.availHeight > window.screen.availWidth) {
+    viewportScale = Math.floor((window.screen.availWidth / 800) * 100) / 100;
+  } else {
+    viewportScale = Math.floor((window.screen.availHeight / 800) * 100) / 100;
+  }
+
+  const content =
+    "initial-scale=" +
+    viewportScale +
+    ",user-scalable=no,maximum-scale=3,width=device-width,height=device-height";
+  $("head").append('<meta name="viewport" content="' + content + '">');
+};
+
+const windowResizeHandler = () => {
+  $(window).resize(function() {
+    windowResizeFunction();
+    window.setTimeout(function() {
+      windowResizeFunction();
+    }, 500);
+  });
 };
