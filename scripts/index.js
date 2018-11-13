@@ -11,27 +11,12 @@ const defaultGiverSelectButtonText = "Select Your Name";
 $(() => {
   calculateViewportScale();
   defineDialogs();
+  defineButtons();
   selectGiverClickHandler();
   startSpinButtonClickHandler();
+  clickCounterHandlers();
   initializeWheel();
-
-  $("#winwheelCanvas").click(function() {
-    countWheelClicks();
-  });
-  $("#drawing_complete_span").click(function() {
-    countWheelClicks();
-  });
-
-  $("#select_giver")
-    .button()
-    .html(defaultGiverSelectButtonText)
-    .show();
-  $("#start_spin_button")
-    .button()
-    .show();
-
   windowResizeHandler();
-  $(window).trigger("resize");
 });
 
 const promptForGiverName = () => {
@@ -308,6 +293,16 @@ const defineDialogs = () => {
   }
 };
 
+const defineButtons = () => {
+  $("#select_giver")
+    .button()
+    .html(defaultGiverSelectButtonText)
+    .show();
+  $("#start_spin_button")
+    .button()
+    .show();
+};
+
 const windowResizeFunction = () => {
   const height = window.screen.availHeight;
 
@@ -385,6 +380,20 @@ const openDialog = (selector, loading = true) => {
   }
 };
 
+const calculateViewportScale = () => {
+  if (window.screen.availHeight > window.screen.availWidth) {
+    viewportScale = Math.floor((window.screen.availWidth / 800) * 100) / 100;
+  } else {
+    viewportScale = Math.floor((window.screen.availHeight / 800) * 100) / 100;
+  }
+
+  const content =
+    "initial-scale=" +
+    viewportScale +
+    ",user-scalable=no,maximum-scale=3,width=device-width,height=device-height";
+  $("head").append('<meta name="viewport" content="' + content + '">');
+};
+
 const selectGiverClickHandler = () => {
   $("#select_giver").click(async () => {
     if ($("#select_giver_dialog").dialog("isOpen")) {
@@ -408,18 +417,13 @@ const startSpinButtonClickHandler = () => {
   });
 };
 
-const calculateViewportScale = () => {
-  if (window.screen.availHeight > window.screen.availWidth) {
-    viewportScale = Math.floor((window.screen.availWidth / 800) * 100) / 100;
-  } else {
-    viewportScale = Math.floor((window.screen.availHeight / 800) * 100) / 100;
-  }
-
-  const content =
-    "initial-scale=" +
-    viewportScale +
-    ",user-scalable=no,maximum-scale=3,width=device-width,height=device-height";
-  $("head").append('<meta name="viewport" content="' + content + '">');
+const clickCounterHandlers = () => {
+  $("#winwheelCanvas").click(function() {
+    countWheelClicks();
+  });
+  $("#drawing_complete_span").click(function() {
+    countWheelClicks();
+  });
 };
 
 const windowResizeHandler = () => {
@@ -429,4 +433,5 @@ const windowResizeHandler = () => {
       windowResizeFunction();
     }, 500);
   });
+  $(window).trigger("resize");
 };
