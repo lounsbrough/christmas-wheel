@@ -85,7 +85,7 @@ const doSpin = () => {
     window.setTimeout(function() {
       $("#display_wish_list").dialog("open");
       window.setTimeout(function() {
-        reset_page_counter();
+        resetPageCounter();
       }, 1000);
     }, 1000);
   }

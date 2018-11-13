@@ -1,37 +1,10 @@
-var isMobile = {
-  Android: function() {
-    return navigator.userAgent.match(/Android/i);
-  },
-  BlackBerry: function() {
-    return navigator.userAgent.match(/BlackBerry/i);
-  },
-  iOS: function() {
-    return navigator.userAgent.match(/iPhone|iPad|iPod/i);
-  },
-  Opera: function() {
-    return navigator.userAgent.match(/Opera Mini/i);
-  },
-  Windows: function() {
-    return navigator.userAgent.match(/IEMobile/i);
-  },
-  any: function() {
-    return (
-      isMobile.Android() ||
-      isMobile.BlackBerry() ||
-      isMobile.iOS() ||
-      isMobile.Opera() ||
-      isMobile.Windows()
-    );
-  }
-};
-
-var viewport_scale = "";
+var viewportScale = "";
 var dummyAngle = 10;
 var currentDummyAngle = 0;
-var calculation_timeout = "";
-var giver_selected = false;
-var nbr_wheel_clicks = 0;
-var click_timeout = false;
+var calculationTimeout = "";
+var giverSelected = false;
+var numberWheelClicks = 0;
+var clickTimeout = false;
 
 $(() => {
   $("#select_giver").click(async () => {
@@ -146,7 +119,7 @@ $(() => {
   $("#start_spin_button").click(() => {
     $("#start_spin_button").button("option", "disabled", true);
     $("#select_giver").button("option", "disabled", true);
-    if (giver_selected) {
+    if (giverSelected) {
       processSpinButton();
     } else {
       promptForGiverName();
@@ -187,7 +160,7 @@ $(() => {
       $(".select_name_button").button();
       $(".select_name_button").click(function() {
         $("#select_giver").html($(this).html());
-        giver_selected = true;
+        giverSelected = true;
         $("#select_giver").css({ color: "rgba(0,150,0,0.75)" });
         $("#start_spin_button").css({ color: "rgba(0,150,0,0.75)" });
         $("#select_giver_dialog").dialog("close");
@@ -201,7 +174,7 @@ $(() => {
   const processSpinButton = async () => {
     $("#start_spin_button").data("calculated_target", "");
     dummySpin();
-    calculation_timeout = window.setTimeout(function() {
+    calculationTimeout = window.setTimeout(function() {
       $("#start_spin_button").data("calculated_target", "none");
       $("#calculation_message_span").html("Calculation failed");
       $("#calculation_message_dialog").dialog("open");
@@ -271,14 +244,14 @@ $(() => {
         cache: false
       });
     }
-    giver_selected = false;
+    giverSelected = false;
   };
 
   $("#winwheelCanvas").click(function() {
-    count_wheel_clicks();
+    countWheelClicks();
   });
   $("#drawing_complete_span").click(function() {
-    count_wheel_clicks();
+    countWheelClicks();
   });
 
   if ($("#content_wrapper_div").length > 0) {
@@ -286,21 +259,21 @@ $(() => {
   }
 
   if (window.screen.availHeight > window.screen.availWidth) {
-    viewport_scale = Math.floor((window.screen.availWidth / 800) * 100) / 100;
+    viewportScale = Math.floor((window.screen.availWidth / 800) * 100) / 100;
   } else {
-    viewport_scale = Math.floor((window.screen.availHeight / 800) * 100) / 100;
+    viewportScale = Math.floor((window.screen.availHeight / 800) * 100) / 100;
   }
 
   var content =
     "initial-scale=" +
-    viewport_scale +
+    viewportScale +
     ",user-scalable=no,maximum-scale=3,width=device-width,height=device-height";
   $("head").append('<meta name="viewport" content="' + content + '">');
 
   $(window).resize(function() {
-    window_resize_function();
+    windowResizeFunction();
     window.setTimeout(function() {
-      window_resize_function();
+      windowResizeFunction();
     }, 500);
   });
 
@@ -313,17 +286,17 @@ $(() => {
     .css({ color: "rgba(150,0,0,0.75)" });
   $("#start_spin_button").css("visibility", "visible");
 
-  window_resize_function();
+  windowResizeFunction();
   window.setTimeout(function() {
-    window_resize_function();
+    windowResizeFunction();
   }, 500);
 });
 
-const count_wheel_clicks = async () => {
-  nbr_wheel_clicks++;
-  window.clearTimeout(click_timeout);
-  click_timeout = window.setTimeout(async () => {
-    if (nbr_wheel_clicks == 5) {
+const countWheelClicks = async () => {
+  numberWheelClicks++;
+  window.clearTimeout(clickTimeout);
+  clickTimeout = window.setTimeout(async () => {
+    if (numberWheelClicks == 5) {
       openDialog("#emails_activated_status_dialog");
       var toggleEmailActiveResponse = await $.get({
         url: "ajax/toggle-email-active.php",
@@ -352,7 +325,7 @@ const count_wheel_clicks = async () => {
       window.setTimeout(function() {
         $("#emails_activated_status_dialog").dialog("close");
       }, 500);
-    } else if (nbr_wheel_clicks == 10) {
+    } else if (numberWheelClicks == 10) {
       openDialog("#drawing_reset_dialog");
       var resetDrawingResponse = await $.get({
         url: "ajax/reset-drawing.php",
@@ -380,29 +353,18 @@ const count_wheel_clicks = async () => {
         $("#drawing_reset_dialog").dialog("close");
       }, 500);
     }
-    nbr_wheel_clicks = 0;
+    numberWheelClicks = 0;
   }, 1000);
 };
 
-function window_resize_function() {
-  var width = 0;
-  var height = 0;
-  if (isMobile.any()) {
-    if (window.orientation == 0 || window.orientation == 180) {
-      width = Math.min(window.screen.availWidth, window.screen.availHeight);
-      height = Math.max(window.screen.availWidth, window.screen.availHeight);
-    } else {
-      width = Math.max(window.screen.availWidth, window.screen.availHeight);
-      height = Math.min(window.screen.availWidth, window.screen.availHeight);
-    }
-  } else {
-    width = $(window).width();
-    height = $(window).height();
-  }
+function windowResizeFunction() {
+  var height = window.screen.availHeight;
+  //height = $(window).outerHeight();
+
   if ($("#content_wrapper_div").length > 0) {
     $("#select_name_div").css(
       "margin-top",
-      Math.max(Math.round((height - 850 * viewport_scale) / 2), 0) + "px"
+      Math.max(Math.round((height - 850 * viewportScale) / 2), 0) + "px"
     );
 
     $(".ui-dialog-content").css("visibility", "visible");
@@ -415,12 +377,12 @@ function window_resize_function() {
   } else {
     $("#drawing_complete_div").css(
       "margin-top",
-      Math.round((height - 120) / 2 / viewport_scale) + "px"
+      Math.round((height - 120) / 2 / viewportScale) + "px"
     );
   }
 }
 
-function reset_page_counter() {
+function resetPageCounter() {
   var seconds = $("#page_reset_seconds").html();
   seconds--;
   $("#page_reset_seconds").html(seconds);
@@ -431,7 +393,7 @@ function reset_page_counter() {
     }, 1000);
   } else {
     window.setTimeout(function() {
-      reset_page_counter();
+      resetPageCounter();
     }, 1000);
   }
 }
@@ -455,10 +417,10 @@ function dummySpin() {
 
     requestAnimationFrame(dummySpin);
   } else if ($("#start_spin_button").data("calculated_target") != "none") {
-    window.clearTimeout(calculation_timeout);
+    window.clearTimeout(calculationTimeout);
     startSpin($("#start_spin_button").data("calculated_target"));
   } else {
-    window.clearTimeout(calculation_timeout);
+    window.clearTimeout(calculationTimeout);
     initialDraw();
   }
 }
