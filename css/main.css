@@ -1,6 +1,11 @@
 html {
   min-height: 100vh;
 }
+body {
+  background-image: url("../images/glass-bubbles.jpg");
+  background-repeat: no-repeat;
+  background-size: cover;
+}
 .transparentDialogRounded .ui-dialog-titlebar {
   display: none;
   -moz-opacity: 0.5;
@@ -17,4 +22,44 @@ html {
 .transparentDialogRounded .ui-widget-content {
   background: rgba(255, 255, 255, 0.7) !important;
   border-radius: 50px !important;
+}
+#content_wrapper_div {
+  min-width: 700px;
+}
+#select_name_div {
+  text-align: center;
+  font-size: 25px;
+  margin-top: 10px;
+}
+#select_giver {
+  font-size: 25px;
+  display: none;
+  white-space: nowrap;
+}
+#winwheelDiv {
+  text-align: center;
+}
+#winwheelCanvas {
+  margin-top: 25px;
+}
+#start_spin_div {
+  text-align: center;
+  margin-top: 25px;
+  margin-bottom: 25px;
+}
+#start_spin_button {
+  font-size: 25px;
+  display: none;
+}
+#drawing_complete_div {
+  margin-top: 50px;
+  min-width: 700px;
+  text-align: center;
+  font-size: 50px;
+  color: #ffffff;
+}
+#drawing_complete_span {
+  background: rgba(255, 255, 255, 0.5);
+  padding: 50px;
+  border-radius: 10px;
 }

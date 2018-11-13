@@ -24,7 +24,7 @@
 
 </head>
 
-<body style="background-image:url('images/glass-bubbles.jpg'); background-repeat:no-repeat; background-size:cover">
+<body>
 
 <?PHP
 
@@ -35,22 +35,22 @@ $unassignedGivers = array_filter($people, function($person) {
 
 if (!empty($unassignedGivers)) {
 ?>
-	<div id="content_wrapper_div" style="min-width:700px">
-	    <div id="select_name_div" style="text-align:center;font-size:25px;margin-top:10px">
-            <button id="select_giver" style="font-size:25px;display:none;white-space:nowrap"></button>
+	<div id="content_wrapper_div">
+	    <div id="select_name_div">
+            <button id="select_giver" ></button>
         </div>
-	    <div style="text-align:center">
-            <canvas id="winwheelCanvas" width="700px" height="700px" style="margin-top:25px"></canvas>
+	    <div id="winwheelDiv">
+            <canvas id="winwheelCanvas" width="700px" height="700px"></canvas>
         </div>
-	    <div style="text-align:center;margin-top:25px;margin-bottom:25px">
-            <button id="start_spin_button" style="font-size:25px;display:none">Spin!</button>
+	    <div id="start_spin_div">
+            <button id="start_spin_button">Spin!</button>
         </div>
     </div>
 <?php
 } else {
 ?>
-	<div id="drawing_complete_div" style="margin-top:50px;min-width:700px;text-align:center;font-size:50px;color:#FFFFFF">
-        <span id="drawing_complete_span" style="background:rgba(255,255,255,0.5);padding:50px;border-radius:10px">Drawing is complete!</span>
+	<div id="drawing_complete_div">
+        <span id="drawing_complete_span">Drawing is complete!</span>
     </div>
 <?php
 }
