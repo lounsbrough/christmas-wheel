@@ -109,15 +109,20 @@ const processSpinButton = async () => {
       url: "ajax/load-wish-list.php?recipient_name=" + determinedPrize.name,
       cache: false
     });
+    var wishListItems = JSON.parse(loadWishListResponse);
 
-    $("#display_wish_list").html(loadWishListResponse);
-    $("#display_wish_list").prepend(
-      '<div style="margin-top:25px;font-size:55px">You drew <span style="font-size:60px;color:#700000">' +
+    $("#display_wish_list").html(
+      '<div class="recipient_assigned_message">You drew <span class="recipient_assigned_name">' +
         determinedPrize.name +
         "</span>!</div>"
     );
+    $("#display_wish_list").append('<div class="recipient_wish_list_name">' + determinedPrize.name + '\'s wish list:</div>');
+    $("#display_wish_list").append('<div class="recipient_wish_list_items"><ul></ul></div>');
+    wishListItems.forEach(wishListItem => {
+      $("#display_wish_list .recipient_wish_list_items ul").append('<li>' + wishListItem + '</li>');
+    });
     $("#display_wish_list").append(
-      '<div style="margin-top:50px;margin-bottom:25px;font-size:25px">Wheel will be reset in <span id="page_reset_seconds" style="font-size:30px;color:#700000">30</span> <span id="page_reset_seconds_text">seconds</span></div>'
+      '<div class="countdown_reset_message">Wheel will be reset in <span id="page_reset_seconds">30</span> <span id="page_reset_seconds_text">seconds</span></div>'
     );
 
     $.get({

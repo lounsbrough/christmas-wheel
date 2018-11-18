@@ -36,6 +36,33 @@ body {
   display: none;
   white-space: nowrap;
 }
+#display_wish_list .recipient_assigned_message {
+  margin-top: 25px;
+  font-size: 55px;
+}
+#display_wish_list .recipient_assigned_name {
+  font-size: 60px;
+  color: #700000;
+}
+#display_wish_list .recipient_wish_list_name {
+  font-size: 30px;
+  margin-top: 25px;
+}
+#display_wish_list .recipient_wish_list_items {
+  font-size: 25px;
+  margin-top: 25px;
+  margin-bottom: 25px;
+  text-align: left;
+}
+#display_wish_list .countdown_reset_message {
+  margin-top: 50px;
+  margin-bottom: 25px;
+  font-size: 25px;
+}
+#display_wish_list #page_reset_seconds {
+  font-size: 30px;
+  color: #700000;
+}
 #winwheelDiv {
   text-align: center;
 }
