@@ -5,8 +5,6 @@ if (!$wheelState["emailsActive"]) {
 	die;
 }
 
-require '../../includes/PHPMailer-master/PHPMailerAutoload.php';
-
 $people = json_decode(file_get_contents("../control-files/people.json"), true);
 
 $giver = reset(array_filter($people, function($person) { 
@@ -21,7 +19,9 @@ $wishList = "<ul><li>".implode("</li><li>", $recipient["wishList"])."</li></ul>"
 
 $emailMessage = $recipient["name"]."'s Wish List:<br><br>$wishList";
 
+require_once dirname(__FILE__).'/../includes/PHPMailer-master/PHPMailerAutoload.php';
 $mail = new PHPMailer();
+
 $mail->IsSMTP();
 $mail->IsHTML(true);
 $mail->From = "david.smtp.no.reply@gmail.com";
