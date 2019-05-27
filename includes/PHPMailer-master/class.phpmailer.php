@@ -281,13 +281,13 @@ class PHPMailer
      * SMTP username.
      * @var string
      */
-    public $Username = $_SERVER['SMTP_USERNAME'];
+    public $Username = '';
 
     /**
      * SMTP password.
      * @var string
      */
-    public $Password = $_SERVER['SMTP_PASSWORD'];
+    public $Password = '';
 
     /**
      * SMTP auth type.
@@ -642,6 +642,9 @@ class PHPMailer
      */
     public function __construct($exceptions = false)
     {
+        $this->Username = $_SERVER['SMTP_USERNAME'];
+        $this->Password = $_SERVER['SMTP_PASSWORD'];
+
         $this->exceptions = (boolean)$exceptions;
     }
 
