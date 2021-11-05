@@ -116,11 +116,15 @@ const processSpinButton = async () => {
         determinedPrize.name +
         "</span>!</div>"
     );
-    $("#display_wish_list").append('<div class="recipient_wish_list_name">' + determinedPrize.name + '\'s wish list:</div>');
-    $("#display_wish_list").append('<div class="recipient_wish_list_items"><ul></ul></div>');
-    wishListItems.forEach(wishListItem => {
-      $("#display_wish_list .recipient_wish_list_items ul").append('<li>' + wishListItem + '</li>');
-    });
+
+    if (wishListItems.length) {
+      $("#display_wish_list").append('<div class="recipient_wish_list_name">' + determinedPrize.name + '\'s wish list:</div>');
+      $("#display_wish_list").append('<div class="recipient_wish_list_items"><ul></ul></div>');
+      wishListItems.forEach(wishListItem => {
+        $("#display_wish_list .recipient_wish_list_items ul").append('<li>' + wishListItem + '</li>');
+      });
+    }
+
     $("#display_wish_list").append(
       '<div class="countdown_reset_message">Wheel will be reset in <span id="page_reset_seconds">30</span> <span id="page_reset_seconds_text">seconds</span></div>'
     );

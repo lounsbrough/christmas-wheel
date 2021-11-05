@@ -37,7 +37,7 @@ body {
   white-space: nowrap;
 }
 #display_wish_list .recipient_assigned_message {
-  margin-top: 25px;
+  margin-top: 50px;
   font-size: 55px;
 }
 #display_wish_list .recipient_assigned_name {

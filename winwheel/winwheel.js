@@ -1,6 +1,7 @@
 var wheel;
 var canvasId = "winwheelCanvas";
 var surface;
+var surfaceContext;
 var angle = 0;
 var targetAngle = 0;
 var currentAngle = 0;
@@ -15,8 +16,10 @@ var prizes = window.people.map((person, i) => {
   return { name: person["name"], startAngle: startAngle, endAngle: endAngle };
 });
 
+
 const initializeWheel = () => {
   surface = document.getElementById(canvasId);
+  surfaceContext = surface.getContext("2d");
 
   if (surface === null) {
     return;
@@ -32,7 +35,6 @@ const initializeWheel = () => {
 };
 
 const initialDraw = e => {
-  var surfaceContext = surface.getContext("2d");
   surfaceContext.drawImage(wheel, 0, 0);
 
   drawStaticWheelElements();
@@ -45,7 +47,7 @@ const startSpin = determinedValue => {
   var endAngle = prizes[determinedValue]["endAngle"];
   stopAngle = Math.floor(
     (startAngle +
-      (Math.random() * 0.5 + 0.25) *
+      0.87 *
         rotationalDistance(startAngle, endAngle, 360)) %
       360
   );
@@ -65,8 +67,8 @@ const rotationalDistance = (start, end, full) => {
 };
 
 const doSpin = () => {
-  var surfaceContext = surface.getContext("2d");
   surfaceContext.save();
+  surfaceContext.clearRect(0, 0, surface.width, surface.height);
   surfaceContext.translate(wheel.width / 2, wheel.height / 2);
   surfaceContext.rotate(degreesToRadians(currentAngle));
   surfaceContext.translate(-wheel.width / 2, -wheel.height / 2);
@@ -109,13 +111,12 @@ const resetWheel = () => {
 };
 
 const drawStaticWheelElements = () => {
-  var surfaceContext = surface.getContext("2d");
   drawGrommet(surfaceContext);
   drawPointer(surfaceContext);
 };
 
 const drawGrommet = surfaceContext => {
-  surfaceContext.fillStyle = "rgba(83,153,217,1)";
+  surfaceContext.fillStyle = "rgba(0, 0, 0, 1)";
   surfaceContext.beginPath();
   surfaceContext.arc(350, 350, 10, 0, 2 * Math.PI);
   surfaceContext.closePath();
@@ -125,7 +126,7 @@ const drawGrommet = surfaceContext => {
 const drawPointer = surfaceContext => {
   var pointsX = [350, 500, 350];
   var pointsY = [360, 350, 340];
-  var pointerColor = "rgba(83,153,217,0.75)";
+  var pointerColor = "rgba(0, 0, 0, 0.75)";
 
   surfaceContext.fillStyle = pointerColor;
   surfaceContext.beginPath();
