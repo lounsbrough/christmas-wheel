@@ -642,8 +642,8 @@ class PHPMailer
      */
     public function __construct($exceptions = false)
     {
-        $this->Username = $_SERVER['SMTP_USERNAME'];
-        $this->Password = $_SERVER['SMTP_PASSWORD'];
+        $this->Username = getenv('SMTP_USERNAME');
+        $this->Password = getenv('SMTP_PASSWORD');
 
         $this->exceptions = (boolean)$exceptions;
     }
