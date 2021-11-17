@@ -116,7 +116,7 @@ const drawStaticWheelElements = () => {
 };
 
 const drawGrommet = surfaceContext => {
-  surfaceContext.fillStyle = "rgba(0, 0, 0, 1)";
+  surfaceContext.fillStyle = "rgba(255, 255, 255, 1)";
   surfaceContext.beginPath();
   surfaceContext.arc(350, 350, 10, 0, 2 * Math.PI);
   surfaceContext.closePath();
@@ -126,7 +126,7 @@ const drawGrommet = surfaceContext => {
 const drawPointer = surfaceContext => {
   var pointsX = [350, 500, 350];
   var pointsY = [360, 350, 340];
-  var pointerColor = "rgba(0, 0, 0, 0.75)";
+  var pointerColor = "rgba(255, 255, 255, 0.75)";
 
   surfaceContext.fillStyle = pointerColor;
   surfaceContext.beginPath();

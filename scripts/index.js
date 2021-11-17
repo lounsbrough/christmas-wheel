@@ -353,20 +353,21 @@ const resetPageCounter = () => {
 };
 
 const dummySpin = () => {
-  if (
-    $("#start_spin_button").data("calculated_target") === "" ||
-    dummyAngle < 20
-  ) {
+  const surfaceContext = surface.getContext("2d");
+
+  if ($("#start_spin_button").data("calculated_target") === "" || dummyAngle < 20) {
     dummyAngle += 1;
     dummyAngle = Math.min(dummyAngle, 20);
-    var surfaceContext = surface.getContext("2d");
     surfaceContext.save();
-    surfaceContext.translate(wheel.width * 0.5, wheel.height * 0.5);
+    surfaceContext.clearRect(0, 0, surface.width, surface.height);
+    surfaceContext.translate(wheel.width / 2, wheel.height / 2);
     surfaceContext.rotate(degreesToRadians(currentDummyAngle));
-    surfaceContext.translate(-wheel.width * 0.5, -wheel.height * 0.5);
+    surfaceContext.translate(-wheel.width / 2, -wheel.height / 2);
     surfaceContext.drawImage(wheel, 0, 0);
     surfaceContext.restore();
+
     drawStaticWheelElements();
+
     currentDummyAngle += dummyAngle;
 
     requestAnimationFrame(dummySpin);
