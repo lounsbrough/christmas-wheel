@@ -79,7 +79,7 @@ body {
   display: none;
 }
 #drawing_complete_div {
-  margin-top: 50px;
+  margin-top: 48vh;
   min-width: 700px;
   text-align: center;
   font-size: 50px;
